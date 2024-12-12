@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealChat app</title>
+    <link rel="shortcut icon" href="./Super icons/pardd.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/Real.css">
+    <link rel="stylesheet" href="./css/all.min.css">
+    <script src="./js/all.min.js"></script>
+    <!-- <script src="./js/Real.js"></script> -->
+</head>
+<body>
+    <div class="Start">
+        <div class="Start1">
+            <div class="start2">
+                <div class="formwrap">
+                    <div class="ddd">
+                        <img src="./Super icons/manssincon.png" alt="">
+                        <h3>Dont Worry</h3>
+                        <p style="font-weight: 600;">Your problem will be solve in no time</p>
+                    </div>
+                    <form class="forms" action="">
+                        <h2 class="eer1">Your account is secured</h2>
+                        <h4 class="eer2" style="font-weight: 500; font-size: .9em;">Your account details is 100% safe</h4>
+                        <h4 class="eer2" style="font-weight: 500; font-size: .9em;">Enter your  email below</h4>
+                        <h4 style="margin-top: 3%;" class="errorIN"></h4>
+                            <div style="margin-top: 1%;" class="vibes1">
+                                <label for="ww">
+                                    <i class="fa fa-envelope hh"></i>
+                                </label>
+                                <input id="ww" type="email" placeholder="example@gmail.com" name="">
+                            </div>
+                            <button style="padding:13px 145px" type="button" class="plate">Submit</button>
+                            <a style="text-decoration: none;" href="./indexLogin.html" class="plate">Return to Login</a>
+                            <div style="justify-content: center; margin-top: 2%;" class="come">
+                                <p class="foree" style="font-weight: 500; font-size: .9em;">Check your email for a reset link.</p>
+                            </div>
+                    </form>
+                </div>
+            </div>
+            <div class="start2w">
+                <img src="./Super icons/pwd-reset.png" alt="">
+            </div>
+        </div>
+    </div>
+<script>
+   function Validation(){
+        var Button = document.querySelector('button')
+        var errorMsg = document.querySelector('.errorIN')
+        var entt = document.querySelector('.vibes1')
+        var Email = document.querySelector('#ww')
+        Button.onclick = function(){
+                if(Email.value == ''){
+                entt.style.borderColor = 'red';
+                Email.focus()
+                errorMsg.innerHTML = 'Invalid email address';
+                return
+            }
+            if(!Email.value.match(/^[A-Za-z\._\-0-9]*[@][A-Za-z]*[\.][a-z]{2,4}$/)){
+                entt.style.borderColor = 'red';
+                Email.focus()
+                errorMsg.innerHTML = 'Not a valid email address';
+                return
+            }
+            Email.value = '';
+            alert('weldone')
+            entt.style.borderColor = '';
+            errorMsg.innerHTML = ''
+        }
+   }
+Validation()
+function Revealer(){
+    var Email = document.querySelector('#ww')
+    var entt = document.querySelector('.vibes1')
+    Email.addEventListener('input', function(){
+        entt.style.borderColor = 'gray';
+    })
+}
+Revealer()
+</script>
+</body>
+</html>

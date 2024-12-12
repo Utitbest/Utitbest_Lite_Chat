@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealChat app</title>
+    <link rel="stylesheet" href="./css/Real.css">
+    <link rel="stylesheet" href="./css/all.min.css">
+    <link rel="shortcut icon" href="./Super icons/pardd.png" type="image/x-icon">
+</head>
+<body>
+   
+    <div id="sidebar" style="width: 30%; float: left;">
+        <button id="profileBtn">Profile</button>
+        <button id="settingsBtn">Settings</button>
+        <button id="videoVoiceBtn">Video & Voice</button>
+        <button id="personalizeBtn">Personalize</button>
+    </div>
+    
+    <div id="content" style="height: 70vh; width: 100%; border: 1px solid #ccc;">
+        Select an option to view details here.
+    </div>
+    
+    <style>
+        /* Circular profile image */
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .content-section h2 {
+            font-size: 1.5em;
+            margin-top: 0;
+        }
+    </style>
+    
+    <script>
+        // Sample data
+        const userInfo = {
+            profilePicture: "path/to/profile-picture.jpg",
+            userName: "John Doe",
+            phoneNumber: "+1234567890",
+        };
+    
+        // Display Profile
+        function displayProfile() {
+            const contentDiv = document.getElementById("content");
+            contentDiv.innerHTML = `
+                <div class="content-section">
+                    <img src="${userInfo.profilePicture}" alt="Profile Picture" class="profile-pic">
+                    <h2>${userInfo.userName}</h2>
+                    <p>Phone: ${userInfo.phoneNumber}</p>
+                    <p>Email: johndoe@example.com</p>
+                    <p>Location: New York, USA</p>
+                </div>
+            `;
+        }
+    
+        // Display Settings
+        function displaySettings() {
+            const contentDiv = document.getElementById("content");
+            contentDiv.innerHTML = `
+                <div class="content-section">
+                    <h2>Settings</h2>
+                    <ul>
+                        <li>Change Password</li>
+                        <li>Notification Preferences</li>
+                        <li>Privacy Options</li>
+                        <li>Language: English</li>
+                    </ul>
+                </div>
+            `;
+        }
+    
+        // Display Video & Voice Options
+        function displayVideoVoice() {
+            const contentDiv = document.getElementById("content");
+            contentDiv.innerHTML = `
+                <div class="content-section">
+                    <h2>Video & Voice</h2>
+                    <p>Options:</p>
+                    <ul>
+                        <li>Start Video Call</li>
+                        <li>Start Voice Call</li>
+                        <li>Microphone Settings</li>
+                        <li>Camera Settings</li>
+                    </ul>
+                </div>
+            `;
+        }
+    
+        // Display Personalize Options
+        function displayPersonalize() {
+            const contentDiv = document.getElementById("content");
+            contentDiv.innerHTML = `
+                <div class="content-section">
+                    <h2>Personalize</h2>
+                    <ul>
+                        <li>Theme: Light/Dark</li>
+                        <li>Chat Background</li>
+                        <li>Font Size: Medium</li>
+                        <li>Notification Sound</li>
+                    </ul>
+                </div>
+            `;
+        }
+    
+        // Add event listeners for each button
+        document.getElementById("profileBtn").addEventListener("click", displayProfile);
+        document.getElementById("settingsBtn").addEventListener("click", displaySettings);
+        document.getElementById("videoVoiceBtn").addEventListener("click", displayVideoVoice);
+        document.getElementById("personalizeBtn").addEventListener("click", displayPersonalize);
+    </script>
+    
+</body>
+</html>

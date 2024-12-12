@@ -1,0 +1,919 @@
+@font-face {
+    font-family: 'monts1';
+    src: url(../font/Montserrat-VariableFont_wght.ttf);
+}
+@font-face {
+    font-family: 'monts2';
+    src: url(../font/Montserrat-Italic-VariableFont_wght.ttf);
+}
+@font-face {
+    font-family: 'Inter1';
+    src: url(../font/InterTight-VariableFont_wght.ttf);
+}
+@font-face {
+    font-family: 'Inter2';
+    src: url(../font/InterTight-Italic-VariableFont_wght.ttf);
+}
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    font-family: 'monts1';
+}
+*::-webkit-scrollbar{
+    width: 4px;
+    background-color: #c7c7c7;
+}
+*::-webkit-scrollbar-thumb{
+    width: 2px;
+    background-color: #fcfcfc91;
+    border-radius: 5px;
+}
+body{
+    line-height: 1.7;
+    height: 100vh;
+    position: relative;
+    flex-direction: column;
+    overflow: hidden;
+    display: flex;
+}
+header{
+    /* height: 10em; */
+    display: flex;
+    border-bottom: 2px solid rgb(211, 211, 211);
+}
+header nav{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+i{
+    color: gray ;
+}
+nav :is(div.forbaricon){
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 10%;
+    height: 100%;
+    padding-left: 1em;
+}
+.forbaricon span{
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #eee;
+    cursor: pointer;
+    border-radius: 50%;
+}
+.forbaricon span:hover{
+    background-color: #d1e7dd;
+    transition: background-color 0.3s ease;
+}
+nav :is(div.forInput){
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25%;
+    height: 100%;
+}
+.forInput span{
+    overflow:hidden;
+    background-color: #eee;
+    align-items: center;
+    display: flex;
+    border-radius:10px;
+    padding:0 4px;
+    height: 35px;
+    width: 90%;
+    gap: 4px;
+}
+.forInput span input{
+    border:none;
+    font-weight: 400;
+    outline:none;
+    background-color:#eee;
+    font-size: .9em;
+    padding:13 10px;
+    width: 90%;
+}
+nav :is(div.currentchatterinfor){
+    width: 40%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 1em;
+    gap: 5px;
+}
+.currentchatterinfor figure{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor:pointer;
+}
+.currentchatterinfor figure img{
+    height: inherit;
+    width: inherit;
+}
+.chattername{
+   display: flex;
+   flex-direction: column;
+}
+.chattername h3{
+    font-size: .9em;
+    color: rgb(95, 93, 93);
+}
+.chattername p{
+    font-size: .8em;
+    font-weight: 500;
+    color: gray;
+}
+nav :is(div.frocalliconsmore){
+    width: 30%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1em;
+    padding-right: 1em;
+}   
+
+.frocalliconsmore span{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    background-color: #eee;
+    cursor: pointer;
+}
+.frocalliconsmore span:hover{
+    background-color: #d1e7dd;
+    transition: background-color 0.3s ease;
+}
+
+
+
+
+
+.mainbody{
+    display:flex ;
+    flex: 1 1 auto;
+    display: flex;
+    overflow: hidden;
+}
+aside{
+    height: 100%;
+    width:5%;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+aside :is(div .iconsdem){
+    height: 100%;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1em;
+    gap: 2em;
+}
+.iconsdem span{
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #eee;
+    cursor: pointer;
+}
+.iconsdem span:hover{
+    background-color: #d1e7dd;
+    transition: background-color 0.3s ease;
+}
+.iconsdem figure{
+    overflow: hidden;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #eee;
+}
+.iconsdem figure img{
+    height: inherit;
+    width: inherit;
+}
+main{
+    height: 100%;
+    width: 95%;
+    display: flex;
+    overflow: hidden;
+}
+main .user{
+    height: 100%;
+    width: 30%;
+    display: flex;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+main .chat_area{
+    height: 100%;
+    width: 70%;
+    display: flex;
+    background:url('../Super icons/background.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.user .secondusers{
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    padding: 2%;
+    align-items: center;
+    flex-direction: column;
+}
+.secondusers .individualchat{
+    width: 100%;
+    height: 67px;
+    display: flex;
+    border-radius: 10px;
+    align-items: center;
+    cursor: pointer;
+}
+.secondusers .individualchat:hover{
+    background-color: #d8d5d591;
+    cursor: pointer;
+    transition: background-color .4s ease-in-out;
+}
+.secondusers .individualchat figure{
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+}
+.secondusers .individualchat figure img{
+    height: inherit;
+    width: inherit;
+}
+div :is(div .username_chat){
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: 100%;
+    justify-content: space-evenly;
+}
+.username_chat h3{
+    font-size: .9em;
+    color: rgb(95, 93, 93);
+    overflow:hidden;
+    white-space: nowrap;
+}
+.username_chat p{
+    font-size: .8em;
+    font-weight: 500;
+    color: gray;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+div :is(div .times){
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    height: 100%;
+    align-items: center;
+}
+.times p{
+    width: 100%;
+    height: 50%;
+    display: flex;
+    font-size: 10px;
+    font-weight: 500;
+    color: rgb(95, 93, 93);
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    align-items: center;
+}
+.times span{
+    width: 100%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.times span span{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    width: 15px;
+    height: 15px;
+    /* background-color: #0a70ea; */
+    color: white;
+    border-radius: 50%;
+}
+.unread-indicator{
+    background-color: #0a70ea;
+}
+.chat_area :is(div .container){
+    flex: 1 1 auto;
+    display: flex;
+    position:relative;
+    background-color: #eeeeeea7;
+    flex-direction: column;
+}
+.chatlies{
+    height:90%;
+    width: 100%;
+    display: flex;
+    /* flex:  1 1 auto; */
+    /* overflow-y: hidden; */
+    overflow: hidden;
+}
+.chatlies :is(div .chatlies1){
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+.chatlies1 .replyer{
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    height: auto;
+}
+.replyer .replyer1{
+    max-width: 50% !important;
+    display: flex;
+    height: auto;
+    align-items: flex-end;
+    justify-content: flex-end;
+    /* flex-direction: row; */
+    padding: .5em 1em;
+}
+.replyer1 figure{
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    margin:0 .7em;
+}
+.replyer1 figure img{
+    height: inherit;
+    width: inherit;
+}
+.replyer1 span{
+    display: flex;
+    height: auto;
+    width: 90%;
+    font-size: .8em;
+    background-color: white;
+    color: rgb(95, 93, 93);
+    font-weight: 600;
+    padding: .6em;
+    justify-content: center;
+    flex-direction: column;
+    border-top-left-radius: 2em;
+    border-bottom-right-radius: 2em;
+    position: relative;
+    border-top-right-radius: 2em;
+}
+.replyer1 span p{
+    height: 90%;
+    width: 100%;
+}
+.replyer1 span h6{
+    height: 10%;
+    width: 100%;
+    text-align: right;
+    bottom: 1em;
+    right: 1em;
+    color: rgb(95, 93, 93);
+}
+
+.chatlies1 :is(div .user_response){
+    height: auto;
+    max-width: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end !important;
+}
+.user_response .user_response1{
+    max-width: 50%;
+    height: auto;
+    display: flex;
+    padding: .5em 1em;
+}
+.user_response1 div{
+    display: flex;
+    height: auto;
+    width: 100%;
+    font-size: .8em;
+    /* background-color:#7ad882; */
+    /* background-color:#7ad882; */
+    background-color: #0a70ea;
+    color:white;
+    font-weight: 600;
+    padding: .6em;
+    flex-direction: column;
+    border-top-left-radius: 2em;
+    border-bottom-left-radius: 2em;
+    position: relative;
+    border-top-right-radius: 2em;
+}
+.user_response1 div p{
+    height: 90%;
+    width: 100%;
+}
+.user_response1  .finn{
+    display: flex;
+    width: 100%;
+    height: 10%;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: right;
+    gap: 3px;
+}
+
+
+.theInputsEtc{
+    height: 10%;
+    width: 100%;
+    /* display: flex; */
+   
+    background-color: #eee;
+}
+.theInputsEtc .inputing{
+    height: 100%;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.theInputsEtc .inputing1{
+    height: 100%;
+    width: 20%;
+    /* display: flex; */
+    align-items: center;
+    /* justify-content: space-evenly; */
+}
+.inputing div{
+    display: flex;
+    height: 80%;
+    width: inherit;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: -2px 2px 9px 0px #979797;
+
+}
+.inputing div p{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-size: 1.3em;
+    width: 10%;
+    height: 100%;
+    border-radius: 10px;
+    color: gray;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+.inputing div p:hover{
+    background-color: #d1e7dd;
+    transition: background-color 0.3s ease;
+}
+.inputing div input{
+    outline: none;
+    border: none;
+    height: 75%;
+    width: 80%;
+    padding: 0 .5em;
+    border-radius: 10px;
+    background: none;
+}
+.inputing div span{
+    font-size: 1.3em;
+    color: white;
+    margin-left: 1em;
+    width: 10%;
+    height: 100%;
+    background-color: #3f6bde ;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+.inputing div span i{
+    color: white;
+}
+.inputing1 i{
+    color: gray;
+    font-size: 1.3em;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+/* FOR ALL DROP DOWN IN THE SITE */
+
+.dropdown1{
+    position:absolute;
+    display:flex;
+    bottom:10%;
+    opacity: 1;
+    border-radius: 10px;;
+    right:1.6em;
+    border-radius: 5px;
+    background-color:#ffffff;
+    transition: 1s linear;
+}
+.dropdown1 .dropdown2{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: .3em;
+    justify-content: center;
+}
+.dropdown1 .dropdown2 li{
+    list-style: none;
+    padding:0 .8em;
+    font-size: .9em;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    color: rgb(85, 84, 84);
+}
+.dropdown1 .dropdown2 li:hover{
+    background-color: #d8d5d591;
+}
+.insidehide{
+    transition: 2s linear;
+    display: none !important;
+    opacity: 0;
+}
+.outsideshow{
+    display: flex;
+    transition: 1.5s linear;
+    bottom:10%;
+    animation: spirit 0.2s linear ;
+}
+@keyframes spirit {
+    0%{
+        opacity: 0;
+    }50%{
+        opacity: 0.5;
+    }100%{
+        opacity: 1;
+    }
+}
+
+/* setting popup begins here */
+.settingsPopup{
+    display:flex;
+    width:400px;
+    height: 440px;
+    position:absolute;
+    bottom: 3.7em;
+    left: -10em;
+    border-radius: 10px;
+    overflow: hidden;
+    /* transition: 2s linear; */
+}
+.steeze{
+    left: -100em;
+    transition: 0.5s linear;
+}
+.steeze1{
+    left: .8em;
+    transition: 0.5s linear;
+}
+.settingsPopup .settingsPopup1{
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content:center;
+}
+.settingsPopup1 .contnet1{
+    height: 100%;
+    width: 30%;
+    background: #eee;
+    flex-direction: column;
+    display: flex;
+    padding: .5em;
+    gap: .5em;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+.settingsPopup1 .contnet2{
+    height: 100%;
+    width: 70%;
+    display: flex;
+    overflow: hidden;
+    background: #ffffff;
+}
+.settingsPopup1 .contnet1 .listOfcontents{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    font-size: 15px;
+    color: rgb(95, 93, 93);
+    font-weight: 600;
+    gap: 5px;
+    border-radius: 7px;
+    justify-content: space-around;
+    cursor: pointer;
+    padding:.3em .2em;
+}
+.settingsPopup1 .contnet1 .listOfcontents:hover{
+    background-color: #d8d5d591;
+}
+.Profile_i{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    overflow-y: auto;
+    align-items: center;
+}
+.Profile_i label{
+    height: 75px;
+    width: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 12;
+}
+.Profile_i label img{
+    height: 100%;
+    width: 100%;
+}
+.Profile_i label i{
+    position: absolute;
+    bottom: 10%;
+    right: 40%;
+    display: none;
+    color: rgb(39, 39, 39);
+}
+.Profile_i label img:hover + .rr{
+    display: flex;
+}
+.Profile_i input{
+    display: none;
+}
+.Profile_i :is(div .namecoms){
+    display: flex;
+    width: 100%;
+    padding: .5em 0;
+    flex-direction: column;
+}
+.namecoms .informs{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .2em;
+    background-color:#eee;
+    border-radius: .7em;
+}
+.informs span{
+    width: 10%;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    cursor: pointer;
+    padding: .5em;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+.Profile_i h2{
+    width: 100%;
+    align-items: center;
+    display: flex;
+    color: gray;
+    padding-left: 1em;
+    margin-bottom: .5em;
+}
+.informs p{
+    font-size: 1em;
+    font-weight: 600;
+    width: 90%;
+    color: rgb(75, 74, 74);
+}
+.Profile_i :is(div .phoneNo){
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em 0;
+}
+.namecoms button{
+    padding: 1em;
+    outline: none;
+    border: none;
+    color:rgb(255, 255, 255) ;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color:#3f6bde ;
+    font-weight: 600;
+}
+.Chat{
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.Chat h2{
+    width: 100%;
+    align-items: center;
+    display: flex;
+    padding-left: 1em;
+    color: gray;
+    margin-bottom: 1.4em;
+}
+.Chat button{
+    padding: 1em .5em;
+    width: 80%;
+    outline: none;
+    border: none;
+    color:rgb(255, 255, 255) ;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    justify-content: center;
+    display: flex;
+    background-color:#3f6bde ;
+    font-weight: 600;
+}
+.Chat p{
+    width: 80%;
+    font-size: .7em;
+    font-weight: 600;
+    color: gray;
+}
+.vid_voce{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+}
+.vid_voce h2{
+    width: 100%;
+    align-items: center;
+    display: flex;
+    padding-left: 1em;
+    color: gray;
+    margin-bottom: .7em;
+}
+.vid_voce h5{
+    width: 100%;
+    align-items: center;
+    display: flex;
+    padding-left: 1em;
+    color: gray;
+}
+.vid_voce .testingmicro{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 1em;
+    background-color: #eee;
+    width: 80%;
+    margin-left: 1em;
+    padding: .5em .0em .5em .5em;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.testingmicro h5{
+    color: gray;
+    padding-left: 0;
+}
+.vid_voce .testingmicro1{
+    flex-direction: column;
+    display: flex;
+    margin-top: .3em;
+    width: 100%;
+}
+.testingmicro1 div{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+.vid_voce .speakers{
+    width: 100%;
+    margin-top: 1em;
+    flex-direction: column;
+    display: flex;
+}
+.Xbass{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 1em;
+    background-color: #eee;
+    width: 80%;
+    margin-left: 1em;
+    padding: .5em .0em .5em .5em;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.speakers button{
+    margin: auto;
+    width: 70%;
+    background-color: #0a70ea;
+    color: white;
+    padding: .8em .5em;
+    margin-top: .4em;
+    font-size: .7em ;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+}
+.Customize{
+    height: 100%;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    color: gray;
+}
+.Customize p{
+    position: absolute;
+    top: .1em;
+    font-size: 70px;
+}
+.online {
+    background-color: blue;
+}
+
+.offline {
+    background-color: gray;
+}
+
+.updater{
+    position: absolute;
+    padding: .1em .5em;
+    background-color: #0a70ea;
+    border-radius: .4em;
+    bottom: 3.5em;
+    left: 1em;
+}
+.updater p{
+    /* font-family: 'inter2'; */
+    color: white;
+    font-weight: 600;
+
+}
