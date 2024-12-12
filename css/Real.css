@@ -542,6 +542,18 @@
     .ddd p{
         font-size: .8em;
     }
+    .senns{
+        align-items: center;
+    }
+    .senns1 a{
+        font-size:.7em !important ;
+    }
+    .codere p{
+        font-size: .7em !important;
+    }
+    .roome{
+        width: 100%;
+    }
 }
 @media only screen and (max-width:343px) {
     .ddd{
