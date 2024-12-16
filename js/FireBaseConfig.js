@@ -9,7 +9,7 @@ import { getStorage, uploadBytes, getDownloadURL, ref, uploadBytesResumable } fr
 export default class FirebaseService {
   constructor(config) {
     this.app = initializeApp(config);
-    this.db = getFirestore();
+    this.db = getFirestore(); 
     this.auth = getAuth();
     this.storage = getStorage();
   }
@@ -253,45 +253,7 @@ async listenForMessages(chatId, callback) {
   }
 }
 
-// async listenForMessages11(){
-//   try {
-//     const chatsRef = collection(this.db, "chats");
-//     onSnapshot(chatsRef, (snapshot) => {
-//       console.log("Snapshot triggered. Docs count:", snapshot.size);  
-      
-//       snapshot.docs.forEach((doc) => {
-//         const chatId = doc.id;
 
-//         // Listen for changes in each chat's messages
-//         const messagesRef = collection(this.db, "chats", chatId, "messages");
-//         const q = query(messagesRef, orderBy("timestamp", "asc"));
-
-//         onSnapshot(q, (messagesSnapshot) => {
-//           console.log(`Snapshot for chat ${chatId} triggered. Messages count:`, messagesSnapshot.size);
-
-//           const messages = messagesSnapshot.docs.map((messageDoc) => {
-//             const data = messageDoc.data();
-//             console.log("New message added in chat", chatId, ": ", data);
-
-//             // Ensure the timestamp field exists and is valid
-//             const validTimestamp = data.timestamp || { seconds: 0, nanoseconds: 0 };
-
-//             return {
-//               id: messageDoc.id,
-//               ...data,
-//               timestamp: validTimestamp || null, // Provide default if missing
-//             };
-//           });
-
-//           // Handle messages for this chat (e.g., update the UI)
-//           console.log(`Updated messages for chat ${chatId}:`, messages);
-//         });
-//       });
-//     });
-//   } catch (error) {
-//     console.error("Error listening for messages:", error);
-//   }
-// }
 
 
 
@@ -322,9 +284,6 @@ async listenForMessages11() {
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
               }
-              if(receiverId == receiverId ){
-                this.notifyUser1(receiverId, data)
-              }
             }
           });
         });
@@ -335,21 +294,6 @@ async listenForMessages11() {
   }
 }
 
-notifyUser1(receiverId, message){
-  const usertag = document.querySelector(`.individualchat[data-user-id="${receiverId}"]`)
-  if(usertag){
-    usertag.querySelector(".username_chat p").textContent = message.content;
-    const tt = message.timestamp.seconds;
-    usertag.querySelector('.times p').textContent = this.getRelativeTime1(tt)
-    const st = document.querySelector('.secondusers')
-    if(st){
-      st.removeChild(usertag)
-      st.prepend(usertag)
-    }
-  }else{
-    console.warn(`User tag for sender ${receiverId} not found.`);
-  }
-} 
 
 notifyUser(senderId, message) {   
   const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)

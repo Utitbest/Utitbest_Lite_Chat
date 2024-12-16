@@ -298,47 +298,47 @@ onAuthStateChanged(auth, (user) => {
 ///////////////////////////////////////////////////////////////////////////
 
 
-async function fetchAndDisplayLastMessages() {
-    try {
-        // Get all users (excluding the current user)
-        const users = await firebaseService.getAllUsers();
-        if (!users || users.length === 0) {
-            console.log("No users found.");
-            return;
-        }
+// async function fetchAndDisplayLastMessages() {
+//     try {
+//         // Get all users (excluding the current user)
+//         const users = await firebaseService.getAllUsers();
+//         if (!users || users.length === 0) {
+//             console.log("No users found.");
+//             return;
+//         }
 
-        // Loop through each user to fetch their last chat message
-        for (const user of users) {
-            if (user.id !== currentUserId) { // Exclude the current user
-                const chatId = [currentUserId, user.id].sort().join("_"); // Generate the chatId
+//         // Loop through each user to fetch their last chat message
+//         for (const user of users) {
+//             if (user.id !== currentUserId) { // Exclude the current user
+//                 const chatId = [currentUserId, user.id].sort().join("_"); // Generate the chatId
 
-                // Fetch the last message from Firestore
-                const lastMessage = await firebaseService.getLastMessage1(chatId);
-                // Find the corresponding DOM element for the user in the chat list
-                const userElement = document.querySelector(
-                    `.individualchat[data-user-id="${user.id}"]`
-                );
+//                 // Fetch the last message from Firestore
+//                 const lastMessage = await firebaseService.getLastMessage1(chatId);
+//                 // Find the corresponding DOM element for the user in the chat list
+//                 const userElement = document.querySelector(
+//                     `.individualchat[data-user-id="${user.id}"]`
+//                 );
                    
-                if (userElement) {
-                    const messagetime = userElement.querySelector('.times p')
-                    const messagePreviewElement = userElement.querySelector(".username_chat p");
-                    messagePreviewElement.textContent = lastMessage.text || "No messages yet";
-                    if(messagePreviewElement.textContent.length > 25){
-                        messagePreviewElement.textContent = messagePreviewElement.textContent.slice(0, 25) + '...'
-                    } 
-                    const sec = lastMessage.timestamp.seconds;
-                    messagetime.textContent = getRelativeTime1(sec) || '';
-                    if (messagetime.textContent.length > maximum) {
-                        messagetime.textContent = messagetime.textContent.slice(0, maximum) + "...";
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        console.error("Error fetching and displaying last messages:", error);
-    }
-}
-fetchAndDisplayLastMessages()
+//                 if (userElement) {
+//                     const messagetime = userElement.querySelector('.times p')
+//                     const messagePreviewElement = userElement.querySelector(".username_chat p");
+//                     messagePreviewElement.textContent = lastMessage.text || "No messages yet";
+//                     if(messagePreviewElement.textContent.length > 25){
+//                         messagePreviewElement.textContent = messagePreviewElement.textContent.slice(0, 25) + '...'
+//                     } 
+//                     const sec = lastMessage.timestamp.seconds;
+//                     messagetime.textContent = getRelativeTime1(sec) || '';
+//                     if (messagetime.textContent.length > maximum) {
+//                         messagetime.textContent = messagetime.textContent.slice(0, maximum) + "...";
+//                     }
+//                 }
+//             }
+//         }
+//     } catch (error) {
+//         console.error("Error fetching and displaying last messages:", error);
+//     }
+// }
+// fetchAndDisplayLastMessages()
 
 
 function getRelativeTime1(timestamp) {
