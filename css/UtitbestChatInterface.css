@@ -491,8 +491,7 @@ div :is(div .times){
     background-color: white;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: -2px 2px 9px 0px #979797;
-
+    box-shadow:-2px 2px 4px 0px #cbcbcb;
 }
 .inputing div p{
     align-items: center;

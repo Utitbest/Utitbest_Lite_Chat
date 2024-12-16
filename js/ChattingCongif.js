@@ -44,6 +44,10 @@ var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 var profile = document.querySelector('.informs img')
 var inputtag = document.querySelector('.nothings')
+const AudioChat = document.querySelectorAll('.dropdown2 li')
+    AudioChat[0].addEventListener('click', function(){
+        alert('hllo ')
+    })
 const maximum = 7;
 
 
