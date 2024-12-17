@@ -102,15 +102,13 @@ function Settings(){
 Settings()
 onAuthStateChanged(auth, (user) => {
     if (user) {
-      console.log("User is authenticated:", user.uid);
       firebaseService.listenForMessages11();
     } else {
       console.error("No user is logged in. Redirecting to login...");
-      // Optionally, redirect to login page
       window.location.href = './indexLogin.html';
     }
   });
-// Set up user authentication and fetch logged-in user's data
+
 document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -224,6 +222,7 @@ async function loadAllUsers() {
         console.error("Error loading users:", error);
     }
 }
+
 //////////////////////////////////////////////// DEPARTMENT OF ONLINE AND OFFLINE USER
 
 async function updateUserStatus(userId, isActive) {
@@ -411,24 +410,6 @@ async function initializeChat(chatId, otherUserId, lastMessage) {
                         </div>
                     </div>
                     `;
-                    const userElement = document.querySelector(
-                        `.individualchat[data-user-id="${otherUserId}"]`
-                    );
-
-                    // if (userElement) {
-                    //     const messagetime = userElement.querySelector('.times p')
-                    //     const messagePreviewElement = userElement.querySelector(".username_chat p");
-                    //     messagePreviewElement.textContent = message.content || "No messages yet";
-                    //     // if(messagePreviewElement.textContent.length > 25){
-                    //         // messagePreviewElement.textContent = message.content//.slice(0, 25) + '...'
-                    //     // } 
-                    //     // const sec = lastMessage.timestamp.seconds;
-                    //     // messagetime.textContent = getRelativeTime1(sec) || '';
-                    //     // if (messagetime.textContent.length > maximum) {
-                    //     //     messagetime.textContent = messagetime.textContent.slice(0, maximum) + "...";
-                    //     // }
-                    // }
-                    // console.log(otherUserId)
                 }else{
                     messageElement.className = 'replyer';
                     messageElement.innerHTML = `
@@ -442,23 +423,6 @@ async function initializeChat(chatId, otherUserId, lastMessage) {
                         </span>
                     </div>
                     `;
-                    const userElement = document.querySelector(
-                        `.individualchat[data-user-id="${otherUserId}"]`
-                    );
-
-                    // if (userElement) {
-                    //     const messagetime = userElement.querySelector('.times p')
-                    //     const messagePreviewElement = userElement.querySelector(".username_chat p");
-                    //     messagePreviewElement.textContent = message.content || "No messages yet";
-                    //     // if(messagePreviewElement.textContent.length > 25){
-                    //         // messagePreviewElement.textContent = message.content//.slice(0, 25) + '...'
-                    //     // } 
-                    //     // const sec = lastMessage.timestamp.seconds;
-                    //     // messagetime.textContent = getRelativeTime1(sec) || '';
-                    //     // if (messagetime.textContent.length > maximum) {
-                    //     //     messagetime.textContent = messagetime.textContent.slice(0, maximum) + "...";
-                    //     // }
-                    // }
                 }
                 chatlies1.appendChild(messageElement);
             });

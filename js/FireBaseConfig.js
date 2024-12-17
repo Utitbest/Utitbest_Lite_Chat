@@ -164,9 +164,11 @@ async getCurrentUserId() {
 
 
 async sendMessage(chatId, senderId, recipientId, messageContent) {
+
   try {
       const chatRef = doc(this.db, "chats", chatId);
       const chatMessagesRef = collection(chatRef, "messages");
+
 
       // Ensure the chat document exists
       const chatDoc = await getDoc(chatRef);
@@ -177,7 +179,6 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
               lastMessageTimestamp: serverTimestamp(),
               participants: [senderId, recipientId],
           });
-
       }
 
       // Add message to messages subcollection
@@ -186,6 +187,7 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
         recipientId,
         content: messageContent,
         timestamp: serverTimestamp(), // Always include this
+        Status: 'Unseen'
     };
     
       await addDoc(chatMessagesRef, messageData);
@@ -203,11 +205,11 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
 }
 
 
-async addMessageToChat(chatId, messageData) {
-  const chatRef = doc(this.db, "chats", chatId);
-  const chatMessagesRef = collection(chatRef, "messages");
-  await addDoc(chatMessagesRef, messageData);
-}
+// async addMessageToChat(chatId, messageData) {
+//   const chatRef = doc(this.db, "chats", chatId);
+//   const chatMessagesRef = collection(chatRef, "messages");
+//   await addDoc(chatMessagesRef, messageData);
+// }
 
 
 async getLastMessage1(chatId) {
@@ -216,13 +218,13 @@ async getLastMessage1(chatId) {
       const chatData = chatDoc.data();
       return {
           text: chatData.lastMessage || "No messages yet",
-          timestamp: chatData.lastMessageTimestamp, // Ensure timestamp is included
+          timestamp: chatData.lastMessageTimestamp,
       };
   }
   if(!chatDoc.exists()){
     return {
       text: "No messages yet",
-      timestamp: '', // Default value if no message or timestamp exists
+      timestamp: '', 
     };
   }
   
@@ -234,7 +236,6 @@ async listenForMessages(chatId, callback) {
       const q = query(messagesRef, orderBy("timestamp", "asc"));
 
       onSnapshot(q, (snapshot) => {
-        // console.log("Snapshot triggered. Docs count:", snapshot.size);  
           const messages = snapshot.docs.map((doc) => {
               const data = doc.data();
               // console.log("New message added: ", data);
@@ -283,14 +284,15 @@ async listenForMessages11() {
             if (change.type === "added") {
               const data = change.doc.data();              
               const senderId = data.senderId;
-              console.log(senderId)
               const receiverId = data.recipientId;
+              
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
               }
               if (senderId === currentUser.uid) {
                 this.notifyUser(receiverId, data);
               }
+
             }
           });
         });
@@ -308,7 +310,6 @@ notifyUser(userId, message) {
 
   if (userTag) {
     userTag.querySelector(".username_chat p").textContent = message.content;
-    console.log(message)
     let abi;
     if (message.timestamp && message.timestamp.seconds) {
       abi = message.timestamp.seconds; // Firestore Timestamp
@@ -318,7 +319,6 @@ notifyUser(userId, message) {
       abi = Math.floor(Date.now() / 1000);
       console.warn("Invalid or missing timestamp:", message.timestamp);
     }
-    console.log(abi);
     userTag.querySelector('.times p').textContent = this.getRelativeTime1(abi);
     if(userTag.querySelector('.times p').textContent.length > 7){
       userTag.querySelector('.times p').textContent = userTag.querySelector('.times p').textContent.slice(0, 7) + '...';
@@ -359,7 +359,7 @@ notifyUser(userId, message) {
 
 }
 
-  
+
 
 
 }
