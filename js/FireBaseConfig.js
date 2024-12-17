@@ -169,12 +169,14 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
 
       // Ensure the chat document exists
       const chatDoc = await getDoc(chatRef);
+
       if (!chatDoc.exists()) {
           await setDoc(chatRef, {
               lastMessage: messageContent,
               lastMessageTimestamp: serverTimestamp(),
               participants: [senderId, recipientId],
           });
+
       }
 
       // Add message to messages subcollection
@@ -280,6 +282,7 @@ async listenForMessages11() {
             if (change.type === "added") {
               const data = change.doc.data();              
               const senderId = data.senderId;
+              console.log(senderId)
               const receiverId = data.recipientId;
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
@@ -298,11 +301,23 @@ async listenForMessages11() {
 }
 
 
-notifyUser(userId, message) {   
+notifyUser(userId, message) {
   const userTag = document.querySelector(`.individualchat[data-user-id="${userId}"]`)
+  // console.log(userId, message)
+
   if (userTag) {
     userTag.querySelector(".username_chat p").textContent = message.content;
-    const abi = message.timestamp.seconds;
+    console.log(message)
+    let abi;
+    if (message.timestamp && message.timestamp.seconds) {
+      abi = message.timestamp.seconds; // Firestore Timestamp
+    } else if (message.timestamp && message.timestamp.toDate()) {
+      abi = Math.floor(message.timestamp.toDate().getTime() / 1000); // Convert to seconds
+    } else {
+      abi = Math.floor(Date.now() / 1000);
+      console.warn("Invalid or missing timestamp:", message.timestamp);
+    }
+    console.log(abi);
     userTag.querySelector('.times p').textContent = this.getRelativeTime1(abi);
     if(userTag.querySelector('.times p').textContent.length > 7){
       userTag.querySelector('.times p').textContent = userTag.querySelector('.times p').textContent.slice(0, 7) + '...';
@@ -317,9 +332,9 @@ notifyUser(userId, message) {
   }
 }
 
-getRelativeTime1(timestamp) {
+ getRelativeTime1(timestamp) {
   if(timestamp == null){
-      return '';
+      return ''
   }
   const currentTime = new Date();
   const messageTime = new Date(timestamp * 1000); 
@@ -332,8 +347,8 @@ getRelativeTime1(timestamp) {
   const months = Math.floor(days / 30);
   const years = Math.floor(months / 12);
 
-  if (years > 0) return `${years} yr${years > 1 ? 's' : ''}`;
-  if (months > 0) return `${months} mth${months > 1 ? 's' : ''}`;
+  if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
+  if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
   if (days > 0) {
       return days === 1 ? 'Yesterday' : `${days}days ago`;
   }

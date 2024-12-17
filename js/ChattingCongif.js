@@ -482,48 +482,6 @@ sendbutton.addEventListener("click", async function () {
                     messageContent // Message content
                 );
                 
-                // const userElement = document.querySelector(
-                //     `.individualchat[data-user-id="${otherUserId}"]`
-                // );
-                // // console.log(currentUserId)
-                // // console.log(otherUserId)
-                // if (userElement) {
-                //     const messagetime = userElement.querySelector('.times p')
-                //     const messagePreviewElement = userElement.querySelector(".username_chat p");
-                //     messagePreviewElement.textContent = messageContent;
-                //     if(messagePreviewElement.textContent.length > 25){
-                //         messagePreviewElement.textContent = messageContent.slice(0, 25) + '...'
-                //     } 
-                //     const sec = new Date();
-                //     const md = sec.getTime()
-
-                //     messagetime.textContent = getRelativeTime1(md);
-                //     if (messagetime.textContent.length > maximum) {
-                //         messagetime.textContent = getRelativeTime1(md);
-                //         localStorage.setItem('times', JSON.stringify(messagetime.textContent))
-                //     }
-                // }
-
-                // const userElement1 = document.querySelector(
-                //     `.individualchat[data-user-id="${currentUserId}"]`
-                // );
-                
-                // if (userElement1) {
-                //     const messagetime = userElement1.querySelector('.times p')
-                //     const messagePreviewElement = userElement1.querySelector(".username_chat p");
-                //     messagePreviewElement.textContent = messageContent;
-                //     if(messagePreviewElement.textContent.length > 25){
-                //         messagePreviewElement.textContent = messageContent.slice(0, 25) + '...'
-                //     } 
-                //     const sec = new Date();
-                //     const md = sec.getTime()
-
-                //     messagetime.textContent = getRelativeTime1(md);
-                //     if (messagetime.textContent.length > maximum) {
-                //         messagetime.textContent = getRelativeTime1(md);
-                //         localStorage.setItem('times', JSON.stringify(messagetime.textContent))
-                //     }
-                // }
                 chatInputText.value = ""; 
             } catch (error) {
                 console.error("Error sending message:", error);
