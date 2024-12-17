@@ -3,7 +3,8 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.18.0/firebas
 import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, 
   serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
-import { getStorage, uploadBytes, getDownloadURL, ref, uploadBytesResumable } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
+
 
 
 export default class FirebaseService {
