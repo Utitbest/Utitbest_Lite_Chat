@@ -284,6 +284,9 @@ async listenForMessages11() {
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
               }
+              if (senderId === currentUser.uid) {
+                this.notifyUser(receiverId, data);
+              }
             }
           });
         });
@@ -295,8 +298,8 @@ async listenForMessages11() {
 }
 
 
-notifyUser(senderId, message) {   
-  const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
+notifyUser(userId, message) {   
+  const userTag = document.querySelector(`.individualchat[data-user-id="${userId}"]`)
   if (userTag) {
     userTag.querySelector(".username_chat p").textContent = message.content;
     const abi = message.timestamp.seconds;
@@ -310,13 +313,13 @@ notifyUser(senderId, message) {
       userlist.prepend(userTag)
     }
   } else {
-    console.warn(`User tag for sender ${senderId} not found.`);
+    console.warn(`User tag for sender ${userId} not found.`);
   }
 }
 
- getRelativeTime1(timestamp) {
+getRelativeTime1(timestamp) {
   if(timestamp == null){
-      return ''
+      return '';
   }
   const currentTime = new Date();
   const messageTime = new Date(timestamp * 1000); 
@@ -329,8 +332,8 @@ notifyUser(senderId, message) {
   const months = Math.floor(days / 30);
   const years = Math.floor(months / 12);
 
-  if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
-  if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
+  if (years > 0) return `${years} yr${years > 1 ? 's' : ''}`;
+  if (months > 0) return `${months} mth${months > 1 ? 's' : ''}`;
   if (days > 0) {
       return days === 1 ? 'Yesterday' : `${days}days ago`;
   }
