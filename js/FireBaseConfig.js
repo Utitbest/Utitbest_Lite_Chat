@@ -2,7 +2,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js';
 import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, 
   serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
 
 
@@ -162,15 +162,10 @@ async getCurrentUserId() {
     }
 }
 
-
 async sendMessage(chatId, senderId, recipientId, messageContent) {
-
   try {
       const chatRef = doc(this.db, "chats", chatId);
       const chatMessagesRef = collection(chatRef, "messages");
-
-
-      // Ensure the chat document exists
       const chatDoc = await getDoc(chatRef);
 
       if (!chatDoc.exists()) {
@@ -181,18 +176,16 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
           });
       }
 
-      // Add message to messages subcollection
       const messageData = {
         senderId,
         recipientId,
         content: messageContent,
-        timestamp: serverTimestamp(), // Always include this
-        Status: 'Unseen'
+        timestamp: serverTimestamp(), 
+        Status: false
     };
     
       await addDoc(chatMessagesRef, messageData);
 
-      // Update parent chat document
       await updateDoc(chatRef, {
           lastMessage: messageContent,
           lastMessageTimestamp: serverTimestamp(),
@@ -203,14 +196,6 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
       console.error("Error sending message:", error);
   }
 }
-
-
-// async addMessageToChat(chatId, messageData) {
-//   const chatRef = doc(this.db, "chats", chatId);
-//   const chatMessagesRef = collection(chatRef, "messages");
-//   await addDoc(chatMessagesRef, messageData);
-// }
-
 
 async getLastMessage1(chatId) {
   const chatDoc = await getDoc(doc(this.db, "chats", chatId));
@@ -257,11 +242,6 @@ async listenForMessages(chatId, callback) {
   }
 }
 
-
-
-
-
-
 async listenForMessages11() {
   try {
     const currentUser = getAuth().currentUser;
@@ -282,17 +262,18 @@ async listenForMessages11() {
         onSnapshot(q, (messagesSnapshot) => {
           messagesSnapshot.docChanges().forEach((change) => {
             if (change.type === "added") {
-              const data = change.doc.data();              
+              const data = change.doc.data();
+              const messageId = change.doc.id             
               const senderId = data.senderId;
               const receiverId = data.recipientId;
-              
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
+                this.notifyUser12(senderId, data, messageId);
+                // console.log(messageId)
               }
               if (senderId === currentUser.uid) {
                 this.notifyUser(receiverId, data);
               }
-
             }
           });
         });
@@ -302,7 +283,6 @@ async listenForMessages11() {
     console.error("Error listening for messages:", error);
   }
 }
-
 
 notifyUser(userId, message) {
   const userTag = document.querySelector(`.individualchat[data-user-id="${userId}"]`)
@@ -333,7 +313,7 @@ notifyUser(userId, message) {
   }
 }
 
- getRelativeTime1(timestamp) {
+getRelativeTime1(timestamp) {
   if(timestamp == null){
       return ''
   }
@@ -358,6 +338,63 @@ notifyUser(userId, message) {
   return `just now`;
 
 }
+
+
+notifyUser12(senderId, message, messageId){
+  const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
+        if(userTag){
+          if(!message.Status){
+          userTag.querySelector('.times span span').style.backgroundColor = '#0a70ea';
+
+          }else{
+            userTag.querySelector('.times span span').style.backgroundColor = '';
+          }
+        }
+        // console.log(message)
+
+        userTag.addEventListener('click', () =>{
+          // alert('ehh')
+          if(!message.Status){
+            userTag.querySelector('.times span span').style.backgroundColor = '';
+          }
+
+          this.markMessageAsSeen(messageId);
+
+        })
+}
+
+////////////////////////////////////////////////
+
+// erro State for 17 decamber
+
+async markMessageAsSeen(messageId) {
+  try {
+    console.log("Marking message as seen, messageId:", messageId);
+
+    // if (typeof messageId !== "string") {
+    //   console.error("Invalid messageId:", messageId);
+    //   return; // Exit early if messageId is not a string
+    // }
+
+    const messageRef = doc(this.db, "messages", messageId);
+    console.log(messageRef)
+
+    // Check if the document exists
+    // const messageSnapshot = await getDoc(messageRef);
+    // if (!messageSnapshot.exists()) {
+    //   console.error("No document found for messageId:", messageId);
+    //   return; // Exit if the document does not exist
+    // }
+
+    // Document exists, proceed with updating it
+    await updateDoc(messageRef, { 'Status': true });
+
+    console.log("Message marked as seen.");
+  } catch (error) {
+    console.error("Error marking message as seen:", error);
+  }
+}
+
 
 
 
