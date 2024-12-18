@@ -121,6 +121,8 @@ async getCurrentUserId() {
       await setDoc(doc(this.db, "users", userId), {
         uid: userId,
         ...userData,
+        isActive: false,
+        lastActive: serverTimestamp(),
         createdAt: new Date()
       });
 
