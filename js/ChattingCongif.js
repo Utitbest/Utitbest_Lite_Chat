@@ -414,7 +414,7 @@ onAuthStateChanged(auth, async (user) => {
         // Listen for online/offline changes
         window.addEventListener("online", () => updateUserStatus(userId, true));
         window.addEventListener("offline", () => updateUserStatus(userId, false));
-        updateUserStatus(userId, navigator.onLine);
+        // updateUserStatus(userId, navigator.onLine);
 
         // Fetch initial data and set up listener for updates
         await fetchAndListenForUserStatusUpdates();
