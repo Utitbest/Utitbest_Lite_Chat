@@ -404,120 +404,63 @@ sendbutton.addEventListener("click", async function () {
 
 // To be continue////////////////////////////////////////////
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
     if (user) {
         const userId = user.uid;
-        console.log("Current User ID:", userId);
+        console.log("Authenticated user:", userId);
 
-        // Immediately update the user's status
+        // Add online/offline listeners
+        window.addEventListener("online", () => {
+            console.log("Online event triggered");
+            updateUserStatus(userId, true);
+        });
 
-        // Listen for online/offline changes
-        window.addEventListener("online", () => updateUserStatus(userId, true));
-        window.addEventListener("offline", () => updateUserStatus(userId, false));
-        // updateUserStatus(userId, navigator.onLine);
+        window.addEventListener("offline", () => {
+            console.log("Offline event triggered");
+            updateUserStatus(userId, false);
+        });
 
-        // Fetch initial data and set up listener for updates
-        await fetchAndListenForUserStatusUpdates();
+        // Start listening for real-time user status updates
+        listenForUserStatusUpdates();
     }
 });
 
-// Function to immediately fetch user statuses and set up listeners
-// async function fetchAndListenForUserStatusUpdates() {
-//     const usersRef = collection(firebaseService.db, "users"); // Reference to the users collection
-
-//     try {
-//         // Step 1: Fetch initial data to update UI immediately
-//         const snapshot = await getDocs(usersRef);
-//         snapshot.forEach((doc) => {
-//             const userId = doc.id;
-//             const userData = doc.data();
-//             if (userData.isActive !== undefined) {
-//                 updateUserUI(userId, userData.isActive);
-//             }
-//         });
-
-//         // Step 2: Set up real-time listener for changes
-//         onSnapshot(usersRef, (snapshot) => {
-//             snapshot.docChanges().forEach((change) => {
-//                 const userId = change.doc.id;
-//                 const userData = change.doc.data();
-//                 if (change.type === "modified" && userData.isActive !== undefined) {
-//                     updateUserUI(userId, userData.isActive); // Update the UI
-//                     console.log("Realtime Update:", userId, userData.isActive);
-//                 }
-//             });
-//         });
-//     } catch (error) {
-//         console.error("Error fetching user statuses:", error);
-//     }
-// }
-
-
-async function fetchAndListenForUserStatusUpdates() {
-    const usersRef = collection(firebaseService.db, "users");
-
-    try {
-        // Step 1: Fetch all users and add missing fields
-        const snapshot = await getDocs(usersRef);
-        snapshot.forEach(async (doc) => {
-            const userId = doc.id;
-            const userData = doc.data();
-
-            // Check if 'isActive' exists; if not, add it
-            if (userData.isActive === undefined) {
-                console.log(`Adding 'isActive' for user: ${userId}`);
-                await updateDoc(doc.ref, {
-                    isActive: false,
-                    lastActive: serverTimestamp(),
-                });
-            }
-
-            // Update UI with current status
-            if (userData.isActive !== undefined) {
-                updateUserUI(userId, userData.isActive);
-            }
-        });
-
-        // Step 2: Set up real-time listener
-        onSnapshot(usersRef, (snapshot) => {
-            snapshot.docChanges().forEach((change) => {
-                const userId = change.doc.id;
-                const userData = change.doc.data();
-
-                if (change.type === "modified" && userData.isActive !== undefined) {
-                    updateUserUI(userId, userData.isActive);
-                    console.log("Realtime Update:", userId, userData.isActive);
-                }
-            });
-        });
-    } catch (error) {
-        console.error("Error fetching user statuses:", error);
-    }
-}
-
-
-// Function to update user status in Firestore
 async function updateUserStatus(userId, isActive) {
     const userRef = doc(firebaseService.db, "users", userId);
     try {
+        console.log(`Updating status for ${userId}: ${isActive}`);
         await updateDoc(userRef, {
             isActive: isActive,
             lastActive: serverTimestamp(),
         });
-        console.log(`User ${userId} is now ${isActive ? "online" : "offline"}`);
     } catch (error) {
         console.error("Error updating user status:", error);
     }
 }
 
-// Function to update the UI based on user status
+async function listenForUserStatusUpdates() {
+    const usersRef = collection(firebaseService.db, "users");
+    onSnapshot(usersRef, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            const userId = change.doc.id;
+            const userData = change.doc.data();
+
+            console.log(`Snapshot change: ${change.type} for ${userId}`, userData);
+
+            if (change.type === "modified" && userData.isActive !== undefined) {
+                updateUserUI(userId, userData.isActive);
+            }
+        });
+    });
+}
+
 function updateUserUI(userId, isActive) {
     const userElement = document.querySelector(`.individualchat[data-user-id="${userId}"]`);
     if (!userElement) return;
-
     const statusElement = userElement.querySelector(".allactaive span");
     if (statusElement) {
         statusElement.className = isActive ? "online" : "offline";
+        console.log(`Updated UI for ${userId} to ${isActive ? "online" : "offline"}`);
     }
 }
 
