@@ -26,10 +26,11 @@ const firebaseApp = initializeApp(firebaseConfig); // Initialize Firebase
 const firestore = getFirestore(firebaseApp)
 const auth = firebaseService.auth;
 // let currentUserId;   // Stores the logged-in user's ID
-let currentUserId = firebaseService.auth.currentUser?.uid; // Make sure user is logged in
-let otherUserId
+let currentUserId = null//= firebaseService.auth.currentUser?.uid; // Make sure user is logged in
+let otherUserId = null
+console.log(currentUserId)
 
-let chatId = [currentUserId, otherUserId].sort().join('_');
+let chatId = null;
 // console.log(chatId)
 var contentdrop = document.querySelectorAll('.comeins i');
 var settings = document.querySelectorAll('.listOfcontents')
@@ -44,6 +45,7 @@ var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 var profile = document.querySelector('.informs img')
 var inputtag = document.querySelector('.nothings')
+let ActiveChat = null;
 const AudioChat = document.querySelectorAll('.dropdown2 li')
     AudioChat[0].addEventListener('click', function(){
         alert('hllo ')
@@ -147,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
                            </div>
                         </div>
                     `;
+
                     Tologout()
                     // updateprofilepic()
                 })
@@ -198,20 +201,11 @@ async function loadAllUsers() {
                 // Set otherUserId and chatId when a user is clicked
                 userElement.addEventListener('click', async() => {
                     otherUserId = user.id;
-                    chatId = [currentUserId, otherUserId].sort().join('_'); // Create unique chatId for the two users
-                    // alert('ehoo')
+                    chatId = [currentUserId, otherUserId].sort().join('_'); 
                     Chatterinfordisply.innerHTML = user.firstname + user.lastname;
-                    const lastMessage = await firebaseService.getLastMessage1([currentUserId, user.id].sort().join('_'));
-                    const sec = lastMessage.timestamp.seconds;
-                    userElement.querySelector('.times p').textContent = getRelativeTime1(sec);
-                    if(userElement.querySelector('.times p').textContent.length > maximum){
-                        userElement.querySelector('.times p').textContent = getRelativeTime1(sec).slice(0, maximum) + '...'
-                    }
-                    userElement.querySelector('.username_chat p').textContent = lastMessage.text;
-                    if(userElement.querySelector('.username_chat p').textContent.length > 25){
-                        userElement.querySelector('.username_chat p').textContent = lastMessage.text.slice(0, 25) + '...'
-                    }
-                    initializeChat(chatId, otherUserId, lastMessage); 
+                    
+                    initializeChat(chatId); 
+                    
                 });
                 secondusers.appendChild(userElement);
                 
@@ -221,106 +215,6 @@ async function loadAllUsers() {
     } catch (error) {
         console.error("Error loading users:", error);
     }
-}
-
-//////////////////////////////////////////////// DEPARTMENT OF ONLINE AND OFFLINE USER
-
-async function updateUserStatus(userId, isActive) {
-    const userRef = doc(firebaseService.db, "users", userId); // Reference to the user's document
-    try {
-        await updateDoc(userRef, {
-            isActive: isActive, // true for active, false for inactive
-            lastActive: serverTimestamp(), // Update timestamp
-        });
-        // console.log(`User status updated to ${isActive ? "online" : "offline"}`);
-    } catch (error) {
-        console.error("Error updating user status:", error);
-    }
-}
-
-// Function to listen for changes in user status
-async function listenForUserStatusUpdates() {
-    const usersRef = collection(firebaseService.db, "users"); // Reference to the users collection
-    await onSnapshot(usersRef, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            const userId = change.doc.id;
-            const userData = change.doc.data();
-            if (change.type === "modified" && userData.isActive !== undefined) {
-                updateUserUI(userId, userData.isActive); // Update the UI with active status
-                // console.log(userId)
-                // console.log(userData.isActive)
-            }
-        });
-    });
-}
-    
-listenForUserStatusUpdates()
-
-// Function to update the UI based on user status
-function updateUserUI(userId, isActive) {
-    const userElement = document.querySelector(`.individualchat[data-user-id="${userId}"]`);
-    if (!userElement) return; // Skip if no matching element found
-    const statusElement = userElement.querySelector(".allactaive span");
-    if (statusElement) {
-        statusElement.className = isActive ? "online" : "offline"; // Add CSS classes
-    }
-}
-
-// Monitor the current user's connection status
-function monitorConnection(userId) {
-    // Update status initially
-    updateUserStatus(userId, navigator.onLine);
-
-    // Listen for connection changes
-    window.addEventListener("online", () => {
-        updateUserStatus(userId, true);
-    });
-
-    window.addEventListener("offline", () => {
-        updateUserStatus(userId, false);
-    });
-}
-
-// Initialize everything when the user logs in
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const userId = user.uid;
-
-        // Monitor connection status
-        monitorConnection(userId);
-
-        // Listen for changes in the Firestore database
-        listenForUserStatusUpdates();
-    }
-});
-
-///////////////////////////////////////////////////////////////////////////
-
-
-function getRelativeTime1(timestamp) {
-    if(timestamp == null){
-        return ''
-    }
-    const currentTime = new Date();
-    const messageTime = new Date(timestamp * 1000); // Convert seconds to milliseconds
-    const timeDiff = currentTime - messageTime; // Difference in milliseconds
-
-    const seconds = Math.floor(timeDiff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const months = Math.floor(days / 30);
-    const years = Math.floor(months / 12);
-
-    if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
-    if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
-    if (days > 0) {
-        return days === 1 ? 'Yesterday' : `${days}days ago`;
-    }
-    if (hours > 0) return `${hours}hr${hours > 1 ? 's' : ''}`;
-    if (minutes > 0) return `${minutes}min${minutes > 1 ? 's' : ''}`;
-    return `just now`;
-
 }
 
 function getRelativeTime(timestamp) {
@@ -345,10 +239,13 @@ function getRelativeTime(timestamp) {
     return `Just now`; 
 }
 
-
-async function initializeChat(chatId, otherUserId, lastMessage) {
+async function initializeChat(chatId) {
     try {
+        ActiveChat = chatId;
+        chatlies1.innerHTML = "";
+
         firebaseService.listenForMessages(chatId, (messages) => {
+            if(chatId !== ActiveChat) return;
             chatlies1.innerHTML = ""; 
 
             messages.forEach((message) => {
@@ -391,7 +288,100 @@ async function initializeChat(chatId, otherUserId, lastMessage) {
         console.error("Error initializing chat:", error);
     }
 }
+//////////////////////////////////////////////// DEPARTMENT OF ONLINE AND OFFLINE USER
 
+// onAuthStateChanged(auth, (user) => {
+//         if (user) {
+//             const userId = user.uid;
+//             console.log(userId)
+//             window.addEventListener("online", () => {
+//                 updateUserStatus(userId, true);
+//             });
+            
+//             window.addEventListener("offline", () => {
+//                 updateUserStatus(userId, false);
+//             });
+//     //         // Monitor connection status
+    
+//     //         // Listen for changes in the Firestore database
+//             listenForUserStatusUpdates()
+
+//         }
+// });
+
+// // Function to listen for changes in user status
+// async function listenForUserStatusUpdates() {
+//     const usersRef = collection(firebaseService.db, "users"); // Reference to the users collection
+//     await onSnapshot(usersRef, (snapshot) => {
+//         snapshot.docChanges().forEach((change) => {
+//             const userId = change.doc.id;
+//             const userData = change.doc.data();
+//             if (change.type === "modified" && userData.isActive !== undefined) {
+//                 updateUserUI(userId, userData.isActive); // Update the UI with active status
+//                 // console.log(userId)
+//                 // console.log(userData.isActive)
+//                 console.log(userId, userData.isActive)
+//             }
+//         });
+//     });
+// }
+
+// async function updateUserStatus(userId, isActive) {
+//     const userRef = doc(firebaseService.db, "users", userId); // Reference to the user's document
+//     try {
+//         await updateDoc(userRef, {
+//             isActive: isActive, // true for active, false for inactive
+//             lastActive: serverTimestamp(), // Update timestamp
+//         });
+//         // console.log(`User status updated to ${isActive ? "online" : "offline"}`);
+//     } catch (error) {
+//         console.error("Error updating user status:", error);
+//     }
+// }
+// // Function to update the UI based on user status
+
+
+
+// function updateUserUI(userId, isActive) {
+//     const userElement = document.querySelector(`.individualchat[data-user-id="${userId}"]`);
+//     if (!userElement) return; // Skip if no matching element found
+//     const statusElement = userElement.querySelector(".allactaive span");
+//     if (statusElement) {
+//         statusElement.className = isActive ? "online" : "offline"; // Add CSS classes
+//     }
+// }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////
+
+
+// function getRelativeTime1(timestamp) {
+//     if(timestamp == null){
+//         return ''
+//     }
+//     const currentTime = new Date();
+//     const messageTime = new Date(timestamp * 1000); // Convert seconds to milliseconds
+//     const timeDiff = currentTime - messageTime; // Difference in milliseconds
+
+//     const seconds = Math.floor(timeDiff / 1000);
+//     const minutes = Math.floor(seconds / 60);
+//     const hours = Math.floor(minutes / 60);
+//     const days = Math.floor(hours / 24);
+//     const months = Math.floor(days / 30);
+//     const years = Math.floor(months / 12);
+
+//     if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
+//     if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
+//     if (days > 0) {
+//         return days === 1 ? 'Yesterday' : `${days}days ago`;
+//     }
+//     if (hours > 0) return `${hours}hr${hours > 1 ? 's' : ''}`;
+//     if (minutes > 0) return `${minutes}min${minutes > 1 ? 's' : ''}`;
+//     return `just now`;
+
+// }
 sendbutton.addEventListener("click", async function () {
         const messageContent = chatInputText.value.trim();
         if (messageContent){
@@ -412,9 +402,85 @@ sendbutton.addEventListener("click", async function () {
 
 
 
+// To be continue////////////////////////////////////////////
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const userId = user.uid;
+        console.log("Current User ID:", userId);
+
+        // Immediately update the user's status
+        updateUserStatus(userId, navigator.onLine);
+
+        // Listen for online/offline changes
+        window.addEventListener("online", () => updateUserStatus(userId, true));
+        window.addEventListener("offline", () => updateUserStatus(userId, false));
+
+        // Fetch initial data and set up listener for updates
+        await fetchAndListenForUserStatusUpdates();
+    }
+});
+
+// Function to immediately fetch user statuses and set up listeners
+async function fetchAndListenForUserStatusUpdates() {
+    const usersRef = collection(firebaseService.db, "users"); // Reference to the users collection
+
+    try {
+        // Step 1: Fetch initial data to update UI immediately
+        const snapshot = await getDocs(usersRef);
+        snapshot.forEach((doc) => {
+            const userId = doc.id;
+            const userData = doc.data();
+            if (userData.isActive !== undefined) {
+                updateUserUI(userId, userData.isActive);
+            }
+        });
+
+        // Step 2: Set up real-time listener for changes
+        onSnapshot(usersRef, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                const userId = change.doc.id;
+                const userData = change.doc.data();
+                if (change.type === "modified" && userData.isActive !== undefined) {
+                    updateUserUI(userId, userData.isActive); // Update the UI
+                    console.log("Realtime Update:", userId, userData.isActive);
+                }
+            });
+        });
+    } catch (error) {
+        console.error("Error fetching user statuses:", error);
+    }
+}
+
+// Function to update user status in Firestore
+async function updateUserStatus(userId, isActive) {
+    const userRef = doc(firebaseService.db, "users", userId);
+    try {
+        await updateDoc(userRef, {
+            isActive: isActive,
+            lastActive: serverTimestamp(),
+        });
+        console.log(`User ${userId} is now ${isActive ? "online" : "offline"}`);
+    } catch (error) {
+        console.error("Error updating user status:", error);
+    }
+}
+
+// Function to update the UI based on user status
+function updateUserUI(userId, isActive) {
+    const userElement = document.querySelector(`.individualchat[data-user-id="${userId}"]`);
+    if (!userElement) return;
+
+    const statusElement = userElement.querySelector(".allactaive span");
+    if (statusElement) {
+        statusElement.className = isActive ? "online" : "offline";
+    }
+}
 
 
 
+
+////////////////////////////////////////////////////
 
 
 

@@ -364,10 +364,6 @@ notifyUser12(senderId, message, messageId, chatId){
         })
 }
 
-// send me a message on whatsapp let me show you
-////////////////////////////////////////////////
-
-// erro State for 17 decamber
 
 async markMessageAsSeen(chatId, messageId) {
   try {
@@ -392,4 +388,3 @@ async markMessageAsSeen(chatId, messageId) {
 
 
 }
-// starting chat with two individual
