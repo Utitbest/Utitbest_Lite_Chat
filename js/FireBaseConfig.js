@@ -255,7 +255,7 @@ async listenForMessages11() {
     onSnapshot(chatsRef, (snapshot) => {
       snapshot.docs.forEach((doc) => {
         const chatId = doc.id;
-
+        // console.log(chatId)
         const messagesRef = collection(this.db, "chats", chatId, "messages");
         const q = query(messagesRef, orderBy("timestamp", "asc"));
 
@@ -268,7 +268,7 @@ async listenForMessages11() {
               const receiverId = data.recipientId;
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
-                this.notifyUser12(senderId, data, messageId);
+                this.notifyUser12(senderId, data, messageId, chatId);
                 // console.log(messageId)
               }
               if (senderId === currentUser.uid) {
@@ -340,7 +340,7 @@ getRelativeTime1(timestamp) {
 }
 
 
-notifyUser12(senderId, message, messageId){
+notifyUser12(senderId, message, messageId, chatId){
   const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
         if(userTag){
           if(!message.Status){
@@ -354,50 +354,42 @@ notifyUser12(senderId, message, messageId){
 
         userTag.addEventListener('click', () =>{
           // alert('ehh')
-          if(!message.Status){
+          // if(!message.Status){
             userTag.querySelector('.times span span').style.backgroundColor = '';
-          }
+          // }
 
-          this.markMessageAsSeen(messageId);
+          this.markMessageAsSeen(chatId, messageId);
+          // alert('hello')
 
         })
 }
 
+// send me a message on whatsapp let me show you
 ////////////////////////////////////////////////
 
 // erro State for 17 decamber
 
-async markMessageAsSeen(messageId) {
+async markMessageAsSeen(chatId, messageId) {
   try {
-    console.log("Marking message as seen, messageId:", messageId);
-
-    // if (typeof messageId !== "string") {
-    //   console.error("Invalid messageId:", messageId);
-    //   return; // Exit early if messageId is not a string
-    // }
-
-    const messageRef = doc(this.db, "messages", messageId);
-    console.log(messageRef)
+    
+    const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
+    // console.log(messageRef)
 
     // Check if the document exists
-    // const messageSnapshot = await getDoc(messageRef);
-    // if (!messageSnapshot.exists()) {
-    //   console.error("No document found for messageId:", messageId);
-    //   return; // Exit if the document does not exist
-    // }
+    const messageSnapshot = await getDoc(messageRef);
+    if (!messageSnapshot.exists()) {
+      console.error("No document found for messageId:", messageId);
+      return; // Exit if the document does not exist
+    }
 
     // Document exists, proceed with updating it
-    await updateDoc(messageRef, { 'Status': true });
+    await updateDoc(messageRef, {Status: true});
 
-    console.log("Message marked as seen.");
   } catch (error) {
     console.error("Error marking message as seen:", error);
   }
 }
 
 
-
-
-
 }
-
+// starting chat with two individual
