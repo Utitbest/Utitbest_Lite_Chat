@@ -1,9 +1,10 @@
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js";
 import FirebaseService from './FireBaseConfig.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, 
-    serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
-// import { sendMessage, listenForMessages, markMessageAsSeen } from './FirebaseConfig.js';
+import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, getMetadata,} from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
+
+
 
 
 const firebaseConfig = {
@@ -22,7 +23,7 @@ const firebaseConfig = {
 const firebaseService = new FirebaseService(firebaseConfig);
 
 const firebaseApp = initializeApp(firebaseConfig); // Initialize Firebase
-const firestore = getFirestore(firebaseApp)
+const storage = getStorage(firebaseApp)
 const auth = firebaseService.auth;
 // let currentUserId;   // Stores the logged-in user's ID
 let currentUserId = null//= firebaseService.auth.currentUser?.uid; // Make sure user is logged in
@@ -218,24 +219,38 @@ async function loadAllUsers() {
 function updateprofilepic(){
     const ssiiee = document.querySelector('.Profile_i label img')
     const inputtag = document.querySelector('.nothings')
-    inputtag.addEventListener('change', (event) =>{
-                const selemna = event.target.files[0];
-                if(!selemna){
-                    alert('select a file')
-                }
-                if(selemna.size > 12345){
-                    firebaseService.showToast(`Not image file, please select image only`)
-                    console.log(selemna.size)
-                    return;
-                }
-                if(selemna){
-                    console.log(selemna)
-                    const fileURL = URL.createObjectURL(selemna);
-                    window.RealChat = fileURL;
-                    console.log(fileURL)
-                    ssiiee.src = fileURL;   
-                    firebaseService.showToast(`Image uploaded successfully`)
-                }
+    console.log(vaildfilesize)
+    inputtag.addEventListener('change', async (event) =>{
+        try {
+            const selemna = event.target.files[0];
+            if(!selemna){
+                alert('select a file')
+                return
+            }
+            
+            if(selemna.size > 12345){
+                firebaseService.showToast(`Not image file, please select image only`)
+                console.log(selemna.size)
+                return;
+            }
+
+            const vaildfilesize = 10 * 1024 * 1024;
+
+
+
+
+            if(selemna){
+                console.log(selemna)
+                const fileURL = URL.createObjectURL(selemna);
+                window.RealChat = fileURL;
+                console.log(fileURL)    
+                ssiiee.src = fileURL;   
+                firebaseService.showToast(`Image uploaded successfully`)
+            }
+        } catch (error) {
+            
+        }
+               
                 
             })
      

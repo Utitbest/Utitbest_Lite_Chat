@@ -3,8 +3,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.18.0/firebas
 import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, 
   serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
-
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, getMetadata,} from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
 
 
 export default class FirebaseService {
@@ -12,7 +11,7 @@ export default class FirebaseService {
     this.app = initializeApp(config);
     this.db = getFirestore(); 
     this.auth = getAuth();
-    this.storage = getStorage();
+    // this.storage = getStorage();
   }
 
   // Display toast notifications
