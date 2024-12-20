@@ -29,17 +29,7 @@ export default class FirebaseService {
 
   
 
-  async uploadProfilePicture(file, userId) {
-    try {
-        const storageRef = firebase.storage().ref(`profile_pictures/${userId}`);
-        const snapshot = await storageRef.put(file);
-        const downloadURL = await snapshot.ref.getDownloadURL();
-        return downloadURL;
-    } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        throw new Error("Failed to upload profile picture.");
-    }
-}
+
 
 async getCurrentUserId() {
   const user = this.auth.currentUser;
@@ -195,7 +185,8 @@ async sendMessage(chatId, senderId, recipientId, messageContent) {
 
       
   } catch (error) {
-      console.error("Error sending message:", error);
+      this.showToast(`Error sending message: ${error}`, "error");
+      // console.error("Error sending message:", error);
   }
 }
 
@@ -240,7 +231,8 @@ async listenForMessages(chatId, callback) {
           callback(messages);
       });
   } catch (error) {
-      console.error("Error listening for messages:", error);
+      // console.error("Error listening for messages:", error);
+      this.showToast(`Error listening for message: ${error}`);
   }
 }
 
@@ -282,7 +274,8 @@ async listenForMessages11() {
       });
     });
   } catch (error) {
-    console.error("Error listening for messages:", error);
+    // console.error("Error listening for messages:", error);
+    this.showToast(`Error listening for message: ${error}`);
   }
 }
 
@@ -341,7 +334,6 @@ getRelativeTime1(timestamp) {
 
 }
 
-
 notifyUser12(senderId, message, messageId, chatId){
   const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
         if(userTag){
@@ -366,25 +358,22 @@ notifyUser12(senderId, message, messageId, chatId){
         })
 }
 
-
 async markMessageAsSeen(chatId, messageId) {
   try {
     
     const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
-    // console.log(messageRef)
 
-    // Check if the document exists
     const messageSnapshot = await getDoc(messageRef);
     if (!messageSnapshot.exists()) {
       console.error("No document found for messageId:", messageId);
       return; // Exit if the document does not exist
     }
 
-    // Document exists, proceed with updating it
     await updateDoc(messageRef, {Status: true});
 
   } catch (error) {
     console.error("Error marking message as seen:", error);
+    this.showToast(`Error marking message as seen: ${error}`);
   }
 }
 

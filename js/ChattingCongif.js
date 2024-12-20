@@ -1,6 +1,5 @@
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js";
 import FirebaseService from './FireBaseConfig.js';
-import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js";
 import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, 
     serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
@@ -44,13 +43,14 @@ var chatInputText = document.querySelector('.inputing div input')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 var profile = document.querySelector('.informs img')
-var inputtag = document.querySelector('.nothings')
 let ActiveChat = null;
 const AudioChat = document.querySelectorAll('.dropdown2 li')
     AudioChat[0].addEventListener('click', function(){
         alert('hllo ')
     })
 const maximum = 7;
+
+
 
 
 
@@ -149,9 +149,8 @@ document.addEventListener("DOMContentLoaded", () => {
                            </div>
                         </div>
                     `;
-
                     Tologout()
-                    // updateprofilepic()
+                    updateprofilepic()
                 })
 
             } catch (error) {
@@ -162,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
-
 async function loadAllUsers() {
     try{
         const users = await firebaseService.getAllUsers();
@@ -215,6 +213,32 @@ async function loadAllUsers() {
     } catch (error) {
         console.error("Error loading users:", error);
     }
+}
+
+function updateprofilepic(){
+    const ssiiee = document.querySelector('.Profile_i label img')
+    const inputtag = document.querySelector('.nothings')
+    inputtag.addEventListener('change', (event) =>{
+                const selemna = event.target.files[0];
+                if(!selemna){
+                    alert('select a file')
+                }
+                if(selemna.size > 12345){
+                    firebaseService.showToast(`Not image file, please select image only`)
+                    console.log(selemna.size)
+                    return;
+                }
+                if(selemna){
+                    console.log(selemna)
+                    const fileURL = URL.createObjectURL(selemna);
+                    window.RealChat = fileURL;
+                    console.log(fileURL)
+                    ssiiee.src = fileURL;   
+                    firebaseService.showToast(`Image uploaded successfully`)
+                }
+                
+            })
+     
 }
 
 function getRelativeTime(timestamp) {
@@ -288,100 +312,7 @@ async function initializeChat(chatId) {
         console.error("Error initializing chat:", error);
     }
 }
-//////////////////////////////////////////////// DEPARTMENT OF ONLINE AND OFFLINE USER
 
-// onAuthStateChanged(auth, (user) => {
-//         if (user) {
-//             const userId = user.uid;
-//             console.log(userId)
-//             window.addEventListener("online", () => {
-//                 updateUserStatus(userId, true);
-//             });
-            
-//             window.addEventListener("offline", () => {
-//                 updateUserStatus(userId, false);
-//             });
-//     //         // Monitor connection status
-    
-//     //         // Listen for changes in the Firestore database
-//             listenForUserStatusUpdates()
-
-//         }
-// });
-
-// // Function to listen for changes in user status
-// async function listenForUserStatusUpdates() {
-//     const usersRef = collection(firebaseService.db, "users"); // Reference to the users collection
-//     await onSnapshot(usersRef, (snapshot) => {
-//         snapshot.docChanges().forEach((change) => {
-//             const userId = change.doc.id;
-//             const userData = change.doc.data();
-//             if (change.type === "modified" && userData.isActive !== undefined) {
-//                 updateUserUI(userId, userData.isActive); // Update the UI with active status
-//                 // console.log(userId)
-//                 // console.log(userData.isActive)
-//                 console.log(userId, userData.isActive)
-//             }
-//         });
-//     });
-// }
-
-// async function updateUserStatus(userId, isActive) {
-//     const userRef = doc(firebaseService.db, "users", userId); // Reference to the user's document
-//     try {
-//         await updateDoc(userRef, {
-//             isActive: isActive, // true for active, false for inactive
-//             lastActive: serverTimestamp(), // Update timestamp
-//         });
-//         // console.log(`User status updated to ${isActive ? "online" : "offline"}`);
-//     } catch (error) {
-//         console.error("Error updating user status:", error);
-//     }
-// }
-// // Function to update the UI based on user status
-
-
-
-// function updateUserUI(userId, isActive) {
-//     const userElement = document.querySelector(`.individualchat[data-user-id="${userId}"]`);
-//     if (!userElement) return; // Skip if no matching element found
-//     const statusElement = userElement.querySelector(".allactaive span");
-//     if (statusElement) {
-//         statusElement.className = isActive ? "online" : "offline"; // Add CSS classes
-//     }
-// }
-
-
-
-
-///////////////////////////////////////////////////////////////////////////
-
-
-// function getRelativeTime1(timestamp) {
-//     if(timestamp == null){
-//         return ''
-//     }
-//     const currentTime = new Date();
-//     const messageTime = new Date(timestamp * 1000); // Convert seconds to milliseconds
-//     const timeDiff = currentTime - messageTime; // Difference in milliseconds
-
-//     const seconds = Math.floor(timeDiff / 1000);
-//     const minutes = Math.floor(seconds / 60);
-//     const hours = Math.floor(minutes / 60);
-//     const days = Math.floor(hours / 24);
-//     const months = Math.floor(days / 30);
-//     const years = Math.floor(months / 12);
-
-//     if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
-//     if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
-//     if (days > 0) {
-//         return days === 1 ? 'Yesterday' : `${days}days ago`;
-//     }
-//     if (hours > 0) return `${hours}hr${hours > 1 ? 's' : ''}`;
-//     if (minutes > 0) return `${minutes}min${minutes > 1 ? 's' : ''}`;
-//     return `just now`;
-
-// }
 sendbutton.addEventListener("click", async function () {
         const messageContent = chatInputText.value.trim();
         if (messageContent){
@@ -399,7 +330,6 @@ sendbutton.addEventListener("click", async function () {
             }
         }
 });
-
 
 
 // To be continue////////////////////////////////////////////
@@ -445,7 +375,7 @@ async function listenForUserStatusUpdates() {
             const userId = change.doc.id;
             const userData = change.doc.data();
 
-            console.log(`Snapshot change: ${change.type} for ${userId}`, userData);
+            // console.log(`Snapshot change: ${change.type} for ${userId}`, userData);
 
             if (change.type === "modified" && userData.isActive !== undefined) {
                 updateUserUI(userId, userData.isActive);
@@ -463,9 +393,6 @@ function updateUserUI(userId, isActive) {
         console.log(`Updated UI for ${userId} to ${isActive ? "online" : "offline"}`);
     }
 }
-
-
-
 
 ////////////////////////////////////////////////////
 
