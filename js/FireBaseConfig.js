@@ -11,7 +11,7 @@ export default class FirebaseService {
     this.app = initializeApp(config);
     this.db = getFirestore(); 
     this.auth = getAuth();
-    // this.storage = getStorage();
+    this.storage = getStorage();
   }
 
   // Display toast notifications

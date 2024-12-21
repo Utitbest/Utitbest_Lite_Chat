@@ -675,8 +675,8 @@ div :is(div .times){
     align-items: center;
 }
 .Profile_i label{
-    height: 75px;
-    width: 75px;
+    height: 65px;
+    width: 65px;
     display: flex;
     align-items: center;
     justify-content: center;

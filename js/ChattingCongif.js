@@ -23,12 +23,11 @@ const firebaseConfig = {
 const firebaseService = new FirebaseService(firebaseConfig);
 
 const firebaseApp = initializeApp(firebaseConfig); // Initialize Firebase
-const storage = getStorage(firebaseApp)
+// const storage = getStorage(firebaseApp)
 const auth = firebaseService.auth;
 // let currentUserId;   // Stores the logged-in user's ID
 let currentUserId = null//= firebaseService.auth.currentUser?.uid; // Make sure user is logged in
 let otherUserId = null
-console.log(currentUserId)
 
 let chatId = null;
 // console.log(chatId)
@@ -43,7 +42,6 @@ var sendbutton = document.querySelector('.inputing div span')
 var chatInputText = document.querySelector('.inputing div input')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
-var profile = document.querySelector('.informs img')
 let ActiveChat = null;
 const AudioChat = document.querySelectorAll('.dropdown2 li')
     AudioChat[0].addEventListener('click', function(){
@@ -117,16 +115,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (user) {
             try {
                 currentUserId = user.uid;
+
                 const userData = await firebaseService.getUserData(currentUserId);
                 settings[0].addEventListener('click', function(){
                     containerRpy.innerHTML =  `
                         <div class="Profile_i">
                         <h2>Profile</h2>
-                            <label for="eel">
+                        <div style="display:flex; width: 90%; align-items:end;">
+                            <label for="eel" style="margin-left: .5em;">
                                 <img src="./Super icons/f4c1820a-74a2-4fb3-ab1f-bfc13b1db462.jfif" alt="">
                                 <i class="fa fa-edit rr"></i>
                             </label>
+                            <button class="uploadalbum" style=" cursor:pointer; font-weight:600; display:flex; padding:.6em; height:15px; border:none; background:#3f6bde; color:white; border-radius:7px; align-items:center; justify-content:center;">Save</button>
                            <input type="file" accept="image/*" id="eel" class="nothings">
+                        </div>  
                            <div class="namecoms">
                                 <div class="informs" title="Firstname">
                                     <p>${userData.firstname}</p>
@@ -216,45 +218,83 @@ async function loadAllUsers() {
     }
 }
 
-function updateprofilepic(){
+async function updateprofilepic(){
+    onAuthStateChanged(auth, (user) =>{
+        if(user){
+    const userId = user.uid 
     const ssiiee = document.querySelector('.Profile_i label img')
     const inputtag = document.querySelector('.nothings')
-    console.log(vaildfilesize)
-    inputtag.addEventListener('change', async (event) =>{
-        try {
-            const selemna = event.target.files[0];
-            if(!selemna){
-                alert('select a file')
+    const Savebutton = document.querySelector('.uploadalbum')
+    let selectedPic = null;
+    inputtag.addEventListener('change',  (event) =>{
+            const file = event.target.files[0];
+            if(!file){
+                firebaseService.showToast('Please select a file to upload.', 'error')
+                selectedPic = null;
                 return
             }
-            
-            if(selemna.size > 12345){
-                firebaseService.showToast(`Not image file, please select image only`)
-                console.log(selemna.size)
-                return;
-            }
-
             const vaildfilesize = 10 * 1024 * 1024;
 
-
-
-
-            if(selemna){
-                console.log(selemna)
-                const fileURL = URL.createObjectURL(selemna);
-                window.RealChat = fileURL;
-                console.log(fileURL)    
-                ssiiee.src = fileURL;   
-                firebaseService.showToast(`Image uploaded successfully`)
+            if(file.size > vaildfilesize){
+                firebaseService.showToast('File size is greater than 10mb.', 'error')
+                selectedPic = null
+                return;
             }
-        } catch (error) {
             
-        }
-               
-                
+
+            const fileURL = URL.createObjectURL(file);
+            ssiiee.src = fileURL;
+            selectedPic = file;   
+            firebaseService.showToast(`Image uploaded successfully`)
+            console.log(selectedPic)
+
+        })
+
+        
+        
+            Savebutton.addEventListener('click', async ()=>{
+                if (!selectedPic) {
+                    firebaseService.showToast('No file selected for upload.', 'error');
+                    return;
+                }
+                console.log(selectedPic) // the file is log in console correctly, i dont know why firebase reject
+                try {
+                    const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
+    
+                    
+    
+                    await uploadBytes(storageRef, selectedPic);
+                    firebaseService.showToast('Profile picture uploaded successfully!', 'success');
+    
+                    URL.revokeObjectURL(fileURL);
+                    selectedPic = null; 
+                } catch (error) {
+                    console.error('Error:', error.message);
+                    firebaseService.showToast(error.message, 'error');
+                    ssiiee.src = ''; 
+                }
             })
-     
+        }
+    })  
 }
+
+
+// Check if image exists and delete it
+                    // try {
+                    //     const metadata = await getMetadata(storageRef);
+                    //     console.log('Image exists:', metadata);
+    
+                    //     // Delete existing image
+                    //     await deleteObject(storageRef);
+                    //     console.log('Previous image deleted successfully');
+                    //     showToast('Previous profile picture deleted successfully.', 'success');
+                    // } catch (error) {
+                    //     if (error.code === 'storage/object-not-found') {
+                    //         console.log('No previous image found. Proceeding with upload.');
+                    //     } else {
+                    //         throw error; // Rethrow if it's not a "not found" error
+                    //     }
+                    // }
 
 function getRelativeTime(timestamp) {
     const currentTime = new Date();
@@ -352,7 +392,6 @@ sendbutton.addEventListener("click", async function () {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         const userId = user.uid;
-        console.log("Authenticated user:", userId);
 
         // Add online/offline listeners
         window.addEventListener("online", () => {
