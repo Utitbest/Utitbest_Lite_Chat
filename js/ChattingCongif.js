@@ -122,9 +122,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="Profile_i">
                         <h2>Profile</h2>
                         <div style="display:flex; width: 90%; align-items:end;">
-                            <label for="eel" style="margin-left: .5em;">
-                                <img src="./Super icons/f4c1820a-74a2-4fb3-ab1f-bfc13b1db462.jfif" alt="">
+                            <label for="eel" style="margin-left: .5em; position: relative;">
+                                <img src="" alt="">
                                 <i class="fa fa-edit rr"></i>
+                                <span class="spnman" style="position:absolute; top:36%; left:35%; align-items:center; justify-content:center; height:30px; width:30px; border-radius:50%;  background:#3f6bde;">
+                                    <i class="fa fa-spinner fa-spin"style="color:white;"></i>
+                                </span>
                             </label>
                             <button class="uploadalbum" style=" cursor:pointer; font-weight:600; display:flex; padding:.6em; height:15px; border:none; background:#3f6bde; color:white; border-radius:7px; align-items:center; justify-content:center;">Save</button>
                            <input type="file" accept="image/*" id="eel" class="nothings">
@@ -216,20 +219,43 @@ async function loadAllUsers() {
     } catch (error) {
         console.error("Error loading users:", error);
     }
-}
-
+} 
 async function updateprofilepic(){
-    onAuthStateChanged(auth, (user) =>{
-        if(user){
+    onAuthStateChanged(auth, async (user) =>{
+    if(user){
     const userId = user.uid 
     const ssiiee = document.querySelector('.Profile_i label img')
     const inputtag = document.querySelector('.nothings')
     const Savebutton = document.querySelector('.uploadalbum')
+    const spinners = document.querySelector('.spnman');
     let selectedPic = null;
+    ssiiee.style.display = 'none'
+    spinners.style.display = 'flex';
+    const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
+    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+
+    try {
+        const profilePicUrl = await getDownloadURL(storageRef);
+        ssiiee.src = profilePicUrl; // Set user's profile picture
+    } catch (error) {
+        if (error.code === 'storage/object-not-found') {
+        const defaultPicUrl = await getDownloadURL(defaultRef);
+        ssiiee.src = defaultPicUrl;
+        } else {
+            ssiiee.src = `./Super icons/defualtman.jfif`
+            console.error('Error fetching profile picture:', error.message);
+        }
+    }finally{
+        spinners.style.display = 'none'
+        ssiiee.style.display = 'flex';
+    }
+
+
     inputtag.addEventListener('change',  (event) =>{
             const file = event.target.files[0];
             if(!file){
                 firebaseService.showToast('Please select a file to upload.', 'error')
+                // ssiiee.src = profilePicUrl
                 selectedPic = null;
                 return
             }
@@ -251,22 +277,32 @@ async function updateprofilepic(){
         })
 
         
-        
             Savebutton.addEventListener('click', async ()=>{
                 if (!selectedPic) {
                     firebaseService.showToast('No file selected for upload.', 'error');
                     return;
                 }
-                console.log(selectedPic) // the file is log in console correctly, i dont know why firebase reject
+
                 try {
-                    const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
     
-                    
+                      try {
+                        const metadata = await getMetadata(storageRef);
+                        console.log('Image exists:', metadata);
+    
+                        await deleteObject(storageRef);
+                        console.log('Previous image deleted successfully');
+                        firebaseService.showToast('Previous profile picture deleted successfully.', 'success');
+                    } catch (error) {
+                        if (error.code === 'storage/object-not-found') {
+                            console.log('No previous image found. Proceeding with upload.');
+                        } else {
+                            throw error; 
+                        }
+                    }
     
                     await uploadBytes(storageRef, selectedPic);
                     firebaseService.showToast('Profile picture uploaded successfully!', 'success');
-    
-                    URL.revokeObjectURL(fileURL);
+                    URL.revokeObjectURL(ssiiee.src)
                     selectedPic = null; 
                 } catch (error) {
                     console.error('Error:', error.message);
@@ -277,24 +313,39 @@ async function updateprofilepic(){
         }
     })  
 }
+async function uploadalbumpenter() {
+    onAuthStateChanged(auth, async (user) =>{
+        if(user){
+            const userNo = user.uid;
+            const storageRef = ref(firebaseService.storage, `profilePictures/${userNo}.jpg`);
+            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+            const spins = document.querySelector('.spnman1')
+            const userpicture = document.querySelector('.iconsdem figure img')
+            spins.style.display = 'flex';
+            userpicture.style.display = 'none';
+            try {
+                const download = await getDownloadURL(storageRef);
+                userpicture.src = download
+            } catch (error) {
+                if (error.code === 'storage/object-not-found') {
+                    const defaultPicUrl = await getDownloadURL(defaultRef);
+                    userpicture.src = defaultPicUrl;
+                    } else {
+                        userpicture.src = `./Super icons/defualtman.jfif`
+                        console.error('Error fetching profile picture:', error.message);
+                    }
+                // firebaseService.showToast(`Error while retrieving user profile${error}`)   
+            }finally{
+                spins.style.display = 'none';
+                userpicture.style.display = 'flex';
+            }
+           
+        }
+    })
+}
+uploadalbumpenter()
 
-
-// Check if image exists and delete it
-                    // try {
-                    //     const metadata = await getMetadata(storageRef);
-                    //     console.log('Image exists:', metadata);
-    
-                    //     // Delete existing image
-                    //     await deleteObject(storageRef);
-                    //     console.log('Previous image deleted successfully');
-                    //     showToast('Previous profile picture deleted successfully.', 'success');
-                    // } catch (error) {
-                    //     if (error.code === 'storage/object-not-found') {
-                    //         console.log('No previous image found. Proceeding with upload.');
-                    //     } else {
-                    //         throw error; // Rethrow if it's not a "not found" error
-                    //     }
-                    // }
+                  
 
 function getRelativeTime(timestamp) {
     const currentTime = new Date();
