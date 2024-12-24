@@ -334,7 +334,8 @@ getRelativeTime1(timestamp) {
 }
 
 notifyUser12(senderId, message, messageId, chatId){
-  const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
+  
+    const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
         if(userTag){
           if(!message.Status){
           userTag.querySelector('.times span span').style.backgroundColor = '#0a70ea';

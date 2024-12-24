@@ -376,7 +376,7 @@ div :is(div .times){
     /* flex-direction: row; */
     padding: .5em 1em;
 }
-.replyer1 figure{
+/* .replyer1 figure{
     height: 30px;
     width: 30px;
     display: flex;
@@ -389,11 +389,11 @@ div :is(div .times){
 .replyer1 figure img{
     height: inherit;
     width: inherit;
-}
+} */
 .replyer1 span{
     display: flex;
     height: auto;
-    width: 90%;
+    width: 100%;
     font-size: .8em;
     background-color: white;
     color: rgb(95, 93, 93);
@@ -621,7 +621,7 @@ div :is(div .times){
 }
 .steeze{
     left: -100em;
-    transition: 0.5s linear;
+    transition: 1.5s linear;
 }
 .steeze1{
     left: .8em;
@@ -677,6 +677,7 @@ div :is(div .times){
     overflow-y: auto;
     align-items: center;
 }
+
 .Profile_i label{
     height: 65px;
     width: 65px;
@@ -700,7 +701,7 @@ div :is(div .times){
     bottom: 10%;
     right: 40%;
     display: none;
-    color: rgb(39, 39, 39);
+    color: white;
 }
 .Profile_i label img:hover + .rr{
     display: flex;

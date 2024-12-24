@@ -44,6 +44,7 @@ var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 let ActiveChat = null;
 const AudioChat = document.querySelectorAll('.dropdown2 li')
+
     AudioChat[0].addEventListener('click', function(){
         alert('hllo ')
     })
@@ -108,14 +109,13 @@ onAuthStateChanged(auth, (user) => {
       console.error("No user is logged in. Redirecting to login...");
       window.location.href = './indexLogin.html';
     }
-  });
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
                 currentUserId = user.uid;
-
                 const userData = await firebaseService.getUserData(currentUserId);
                 settings[0].addEventListener('click', function(){
                     containerRpy.innerHTML =  `
@@ -155,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
                            </div>
                         </div>
                     `;
+
                     Tologout()
                     updateprofilepic()
                 })
@@ -167,6 +168,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+
 async function loadAllUsers() {
     try{
         const users = await firebaseService.getAllUsers();
@@ -174,8 +177,9 @@ async function loadAllUsers() {
             secondusers.innerHTML = 'No other users found.';
             return
         }
-        users.forEach((user) => {
-            if(user.id !== currentUserId){  
+        
+        users.forEach((user)  => {
+            if(user.id !== currentUserId){
                 const userElement = document.createElement("div");
                 userElement.className = 'individualchat';
                 userElement.setAttribute('data-user-id', user.id)
@@ -203,16 +207,30 @@ async function loadAllUsers() {
                 `;
                 
                 // Set otherUserId and chatId when a user is clicked
+                const repumm = document.querySelector('.currentchatterinfor figure img')
                 userElement.addEventListener('click', async() => {
                     otherUserId = user.id;
+                    const storageRef = ref(firebaseService.storage, `profilePictures/${otherUserId}.jpg`);
+                    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`); 
+                    let profilePicUrl = null
+                    try {
+                        profilePicUrl = await getDownloadURL(storageRef);
+                        repumm.src = profilePicUrl; // Set user's profile picture
+                    } catch (error) {
+                        if (error.code === 'storage/object-not-found') {
+                        const defaultPicUrl = await getDownloadURL(defaultRef);
+                        repumm.src = defaultPicUrl;
+                        } else {
+                            repumm.src = `./Super icons/defualtman.jfif`
+                            console.error('Error fetching profile picture:', error.message);
+                        }
+                    }
                     chatId = [currentUserId, otherUserId].sort().join('_'); 
                     Chatterinfordisply.innerHTML = user.firstname + user.lastname;
-                    
                     initializeChat(chatId); 
                     
                 });
                 secondusers.appendChild(userElement);
-                
             }
 
         });
@@ -224,18 +242,22 @@ async function updateprofilepic(){
     onAuthStateChanged(auth, async (user) =>{
     if(user){
     const userId = user.uid 
+    console.log(userId)
     const ssiiee = document.querySelector('.Profile_i label img')
     const inputtag = document.querySelector('.nothings')
     const Savebutton = document.querySelector('.uploadalbum')
     const spinners = document.querySelector('.spnman');
+    const userpicture = document.querySelector('.iconsdem figure img')
+
     let selectedPic = null;
+    let profilePicUrl = null;
     ssiiee.style.display = 'none'
     spinners.style.display = 'flex';
     const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
     const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
 
     try {
-        const profilePicUrl = await getDownloadURL(storageRef);
+        profilePicUrl = await getDownloadURL(storageRef);
         ssiiee.src = profilePicUrl; // Set user's profile picture
     } catch (error) {
         if (error.code === 'storage/object-not-found') {
@@ -270,9 +292,11 @@ async function updateprofilepic(){
 
             const fileURL = URL.createObjectURL(file);
             ssiiee.src = fileURL;
-            selectedPic = file;   
-            firebaseService.showToast(`Image uploaded successfully`)
-            console.log(selectedPic)
+            userpicture.src = fileURL
+            selectedPic = file; 
+
+            // firebaseService.showToast(`Image uploaded successfully`)
+            // console.log(selectedPic)
 
         })
 
@@ -290,7 +314,7 @@ async function updateprofilepic(){
                         console.log('Image exists:', metadata);
     
                         await deleteObject(storageRef);
-                        console.log('Previous image deleted successfully');
+                        console.log('Previous profile picture deleted successfully');
                         firebaseService.showToast('Previous profile picture deleted successfully.', 'success');
                     } catch (error) {
                         if (error.code === 'storage/object-not-found') {
@@ -299,15 +323,23 @@ async function updateprofilepic(){
                             throw error; 
                         }
                     }
-    
+                    // const ddde = URL.createObjectURL(File)
                     await uploadBytes(storageRef, selectedPic);
+                    const userDocRef = doc(firebaseService.db, 'users', userId);
+                    await setDoc(userDocRef, {
+                        profilePicture: profilePicUrl,
+                        ProfilepictureupdateAt: serverTimestamp()
+                    }, { merge: true });
+
                     firebaseService.showToast('Profile picture uploaded successfully!', 'success');
-                    URL.revokeObjectURL(ssiiee.src)
+                    URL.revokeObjectURL(ssiiee.src, userpicture.src)
+                    console.log(URL.revokeObjectURL(ssiiee.src, userpicture.src))
                     selectedPic = null; 
                 } catch (error) {
                     console.error('Error:', error.message);
                     firebaseService.showToast(error.message, 'error');
-                    ssiiee.src = ''; 
+                    ssiiee.src = defaultRef; 
+                    userpicture.src = defaultRef;
                 }
             })
         }
@@ -343,9 +375,42 @@ async function uploadalbumpenter() {
         }
     })
 }
-uploadalbumpenter()
 
-                  
+// uploadalbumpenter()
+////////////////////////TO CONTINUE FROM HERE WERE TO RETURN OTHER USER PICTURES
+
+
+
+async function profileDisplayer() {
+    onAuthStateChanged(auth, async (user) =>{
+        console.log(user.uid)
+        if(user){
+            const remom = user.uid
+            console.log(remom)
+            const userTag = document.querySelector(`.individualchat[data-user-id="${remom}"]`)
+                    if(userTag){
+                        const storageRef = ref(firebaseService.storage, `profilePictures/${remom}.jpg`);
+                        console.log(storageRef)
+                        const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`); 
+                        let profilePicUrl = null
+                    try {
+                        profilePicUrl = await getDownloadURL(storageRef);
+                        userTag.document.querySelector('.secondusers .individualchat figure img').src = profilePicUrl; // Set user's profile picture
+                    } catch (error) {
+                        if (error.code === 'storage/object-not-found') {
+                        const defaultPicUrl = await getDownloadURL(defaultRef);
+                        userTag.document.querySelector('.secondusers .individualchat figure img').src = defaultPicUrl;
+                        } else {
+                            userTag.document.querySelector('.secondusers .individualchat figure img').src = `./Super icons/defualtman.jfif`
+                            console.error('Error fetching profile picture:', error.message);
+                        }
+                    }
+                    }
+        }
+                
+    })
+}
+profileDisplayer()
 
 function getRelativeTime(timestamp) {
     const currentTime = new Date();
@@ -398,9 +463,6 @@ async function initializeChat(chatId) {
                     messageElement.className = 'replyer';
                     messageElement.innerHTML = `
                     <div class="replyer1">
-                        <figure>
-                            <img src="./Super icons/f4c1820a-74a2-4fb3-ab1f-bfc13b1db462.jfif" alt="">
-                        </figure>
                         <span>
                             <p>${message.content}</p>
                             <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
