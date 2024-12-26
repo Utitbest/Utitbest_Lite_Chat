@@ -25,8 +25,8 @@ const firebaseService = new FirebaseService(firebaseConfig);
 const firebaseApp = initializeApp(firebaseConfig); // Initialize Firebase
 // const storage = getStorage(firebaseApp)
 const auth = firebaseService.auth;
-// let currentUserId;   // Stores the logged-in user's ID
-let currentUserId = null//= firebaseService.auth.currentUser?.uid; // Make sure user is logged in
+const auth1 = getAuth(firebaseApp)
+let currentUserId = null; // Make sure user is logged in
 let otherUserId = null
 
 let chatId = null;
@@ -43,8 +43,8 @@ var chatInputText = document.querySelector('.inputing div input')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 let ActiveChat = null;
+const userprofileId = null;
 const AudioChat = document.querySelectorAll('.dropdown2 li')
-
     AudioChat[0].addEventListener('click', function(){
         alert('hllo ')
     })
@@ -169,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-
 async function loadAllUsers() {
     try{
         const users = await firebaseService.getAllUsers();
@@ -177,9 +176,12 @@ async function loadAllUsers() {
             secondusers.innerHTML = 'No other users found.';
             return
         }
-        
         users.forEach((user)  => {
-            if(user.id !== currentUserId){
+                if (user.id === currentUserId) {
+                    // console.log('Skipping current user from friends list:', currentUserId);
+                    return; // Skip to the next iteration
+                }
+
                 const userElement = document.createElement("div");
                 userElement.className = 'individualchat';
                 userElement.setAttribute('data-user-id', user.id)
@@ -188,7 +190,10 @@ async function loadAllUsers() {
                         <div style="display: flex; align-items: center; justify-content: center; width: 20%; height: 100%; position: relative;" class="allactaive">
                         <span class="" style="position: absolute; top:11px; left:5px; border-radius:50%; width:7px; height:7px;"></span>
                             <figure>
-                                <img src="./Super icons/manssincon.png" alt="">
+                               <img src="" alt="" class="converse">
+                               <utit class="spnman11" style="position :absolute; align-items:center; justify-content:center; height:40px; width:40px; border-radius:50%;  background:#3f6bde;">
+                                    <i class="fa fa-spinner fa-spin"style="color:white;"></i>
+                                </utit>
                             </figure>
                         </div>
                         <div style="display: flex; align-items: center; width: 80%; height: 100%;">
@@ -199,14 +204,14 @@ async function loadAllUsers() {
                             <div class="times">
                                 <p>20:30</p>
                                 <span>
-                                    <span></span>
+                                    <span class="whatsappna"></span>
                                 </span>
                             </div>
                         </div>
                     </div>
                 `;
-                
-                // Set otherUserId and chatId when a user is clicked
+                 setUserProfilePicture(user.id, userElement)
+
                 const repumm = document.querySelector('.currentchatterinfor figure img')
                 userElement.addEventListener('click', async() => {
                     otherUserId = user.id;
@@ -231,18 +236,43 @@ async function loadAllUsers() {
                     
                 });
                 secondusers.appendChild(userElement);
-            }
+
+            // }
 
         });
     } catch (error) {
         console.error("Error loading users:", error);
     }
 } 
+
+async function setUserProfilePicture(userId, userElement) {
+    const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
+    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+    const profileImg = userElement.querySelector('.converse');
+    const spinner = userElement.querySelector('.spnman11');
+    spinner.style.display = 'flex';
+
+    try {
+        const profilePicUrl = await getDownloadURL(storageRef);
+        profileImg.src = profilePicUrl; // Set fetched profile picture
+    } catch (error) {
+        if (error.code === 'storage/object-not-found') {
+            const defaultPicUrl = await getDownloadURL(defaultRef);
+
+            profileImg.src = defaultPicUrl; // Set default profile picture
+        } else {
+            console.error('Error fetching profile picture:', error.message);
+        }
+    } finally {
+        spinner.style.display = 'none'; // Hide spinner
+    }
+    
+}
+
 async function updateprofilepic(){
     onAuthStateChanged(auth, async (user) =>{
     if(user){
     const userId = user.uid 
-    console.log(userId)
     const ssiiee = document.querySelector('.Profile_i label img')
     const inputtag = document.querySelector('.nothings')
     const Savebutton = document.querySelector('.uploadalbum')
@@ -259,12 +289,15 @@ async function updateprofilepic(){
     try {
         profilePicUrl = await getDownloadURL(storageRef);
         ssiiee.src = profilePicUrl; // Set user's profile picture
+        userpicture.src = profilePicUrl
     } catch (error) {
         if (error.code === 'storage/object-not-found') {
         const defaultPicUrl = await getDownloadURL(defaultRef);
         ssiiee.src = defaultPicUrl;
+        userpicture.defaultPicUrl
         } else {
             ssiiee.src = `./Super icons/defualtman.jfif`
+            userpicture.src = `./Super icons/defualtman.jfif`
             console.error('Error fetching profile picture:', error.message);
         }
     }finally{
@@ -333,7 +366,6 @@ async function updateprofilepic(){
 
                     firebaseService.showToast('Profile picture uploaded successfully!', 'success');
                     URL.revokeObjectURL(ssiiee.src, userpicture.src)
-                    console.log(URL.revokeObjectURL(ssiiee.src, userpicture.src))
                     selectedPic = null; 
                 } catch (error) {
                     console.error('Error:', error.message);
@@ -345,72 +377,35 @@ async function updateprofilepic(){
         }
     })  
 }
-async function uploadalbumpenter() {
-    onAuthStateChanged(auth, async (user) =>{
-        if(user){
-            const userNo = user.uid;
-            const storageRef = ref(firebaseService.storage, `profilePictures/${userNo}.jpg`);
-            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
-            const spins = document.querySelector('.spnman1')
-            const userpicture = document.querySelector('.iconsdem figure img')
-            spins.style.display = 'flex';
-            userpicture.style.display = 'none';
-            try {
-                const download = await getDownloadURL(storageRef);
-                userpicture.src = download
-            } catch (error) {
-                if (error.code === 'storage/object-not-found') {
-                    const defaultPicUrl = await getDownloadURL(defaultRef);
-                    userpicture.src = defaultPicUrl;
-                    } else {
-                        userpicture.src = `./Super icons/defualtman.jfif`
-                        console.error('Error fetching profile picture:', error.message);
-                    }
-                // firebaseService.showToast(`Error while retrieving user profile${error}`)   
-            }finally{
-                spins.style.display = 'none';
-                userpicture.style.display = 'flex';
-            }
-           
-        }
-    })
-}
-
-// uploadalbumpenter()
-////////////////////////TO CONTINUE FROM HERE WERE TO RETURN OTHER USER PICTURES
-
-
 
 async function profileDisplayer() {
     onAuthStateChanged(auth, async (user) =>{
-        console.log(user.uid)
-        if(user){
-            const remom = user.uid
-            console.log(remom)
-            const userTag = document.querySelector(`.individualchat[data-user-id="${remom}"]`)
-                    if(userTag){
-                        const storageRef = ref(firebaseService.storage, `profilePictures/${remom}.jpg`);
-                        console.log(storageRef)
-                        const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`); 
-                        let profilePicUrl = null
-                    try {
-                        profilePicUrl = await getDownloadURL(storageRef);
-                        userTag.document.querySelector('.secondusers .individualchat figure img').src = profilePicUrl; // Set user's profile picture
-                    } catch (error) {
-                        if (error.code === 'storage/object-not-found') {
-                        const defaultPicUrl = await getDownloadURL(defaultRef);
-                        userTag.document.querySelector('.secondusers .individualchat figure img').src = defaultPicUrl;
-                        } else {
-                            userTag.document.querySelector('.secondusers .individualchat figure img').src = `./Super icons/defualtman.jfif`
-                            console.error('Error fetching profile picture:', error.message);
-                        }
-                    }
-                    }
-        }
-                
+        if(user.uid ){
+            const picm = document.querySelector('.iconsdem figure img')
+            const storageRef = ref(firebaseService.storage, `profilePictures/${user.uid}.jpg`);
+            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+            const spinner = document.querySelector('.spnman1')
+            spinner.style.display = 'flex';
+            picm.style.display = 'none';
+            try {
+                const dowm = await getDownloadURL(storageRef)
+                picm.src = dowm;
+            } catch (error) {
+                  if (error.code === 'storage/object-not-found'){
+                    const ty = await getDownloadURL(defaultRef)
+                    picm.src = ty
+                  }else{
+                    picm.src = `./Super icons/defualtman.jfif`;
+                    console.error('Error fetching profile picture:', error.message);
+                  }
+            }finally{
+                spinner.style.display = 'none';
+                picm.style.display = 'flex';
+            }
+        }     
     })
 }
-profileDisplayer()
+await profileDisplayer()
 
 function getRelativeTime(timestamp) {
     const currentTime = new Date();

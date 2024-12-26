@@ -238,7 +238,6 @@ async listenForMessages(chatId, callback) {
 async listenForMessages11() {
   try {
     const currentUser = getAuth().currentUser;
-
     if (!currentUser) {
       console.error("No user is logged in.");
       return;
@@ -278,7 +277,7 @@ async listenForMessages11() {
   }
 }
 
-notifyUser(userId, message) {
+ notifyUser(userId, message) {
   const userTag = document.querySelector(`.individualchat[data-user-id="${userId}"]`)
   // console.log(userId, message)
 
@@ -333,29 +332,31 @@ getRelativeTime1(timestamp) {
 
 }
 
-notifyUser12(senderId, message, messageId, chatId){
-  
-    const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
-        if(userTag){
-          if(!message.Status){
-          userTag.querySelector('.times span span').style.backgroundColor = '#0a70ea';
+ notifyUser12(senderId, message, messageId, chatId){
+      const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
+      const sww = userTag.querySelector('.times span .whatsappna')
 
-          }else{
-            userTag.querySelector('.times span span').style.backgroundColor = '';
-          }
+      if(sww){
+        if(!message.Status){
+        // userTag.querySelector('.times span span').style.backgroundColor = '#0a70ea';
+          sww.style.backgroundColor = '#0a70ea'
+        }else{
+          sww.style.backgroundColor = ''
         }
-        // console.log(message)
+      }
+      // console.log(sww)
 
-        userTag.addEventListener('click', () =>{
-          // alert('ehh')
-          // if(!message.Status){
-            userTag.querySelector('.times span span').style.backgroundColor = '';
-          // }
+      sww.addEventListener('click', () =>{
+        alert('ehh')
+        // if(!message.Status){
+          sww.style.backgroundColor = '';
+        // }
 
-          this.markMessageAsSeen(chatId, messageId);
-          // alert('hello')
+        this.markMessageAsSeen(chatId, messageId);
+        // alert('hello')
 
-        })
+      })
+    
 }
 
 async markMessageAsSeen(chatId, messageId) {

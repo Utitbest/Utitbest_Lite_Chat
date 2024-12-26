@@ -124,6 +124,8 @@ nav :is(div.currentchatterinfor){
 .currentchatterinfor figure img{
     height: inherit;
     width: inherit;
+    object-fit: cover;
+    object-position: top;
 }
 .chattername{
    display: flex;
@@ -273,11 +275,14 @@ main .chat_area{
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
     border-radius: 50%;
 }
 .secondusers .individualchat figure img{
     height: inherit;
     width: inherit;
+    object-fit: cover;
+    object-position: top;
 }
 div :is(div .username_chat){
     display: flex;
@@ -330,8 +335,8 @@ div :is(div .times){
     align-items: center;
     justify-content: center;
     display: flex;
-    width: 15px;
-    height: 15px;
+    width: 0px;
+    height: 0px;
     /* background-color: #0a70ea; */
     color: white;
     border-radius: 50%;
@@ -926,4 +931,7 @@ div :is(div .times){
 }
 .spnman1{
     display: none;
+}
+.spnman11{
+  display: none;
 }
