@@ -14,7 +14,6 @@ export default class FirebaseService {
     this.storage = getStorage();
   }
 
-  // Display toast notifications
   showToast(message, type = "success") {
     Toastify({
       text: message,
@@ -337,23 +336,15 @@ getRelativeTime1(timestamp) {
       const sww = userTag.querySelector('.times span .whatsappna')
       if(sww){
         if(!message.Status){
-        // userTag.querySelector('.times span span').style.backgroundColor = '#0a70ea';
-        // console.log(message.Status)
           sww.style.backgroundColor = '#0a70ea';
         }else{
           sww.style.backgroundColor = '';
         }
       }
-      // console.log(sww)
 
       userTag.addEventListener('click', () =>{
-        // if(!message.Status){
-          sww.style.backgroundColor = '';
-        // }
-
+        sww.style.backgroundColor = '';
         this.markMessageAsSeen(chatId, messageId);
-        // alert('hello')
-
       })
     
 }

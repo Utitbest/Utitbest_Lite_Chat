@@ -243,9 +243,10 @@ main .chat_area{
     height: 100%;
     width: 70%;
     display: flex;
-    background:url('../Super icons/background.jpg');
+    background:url('../Super icons/word4.jpg');
     background-repeat: no-repeat;
     background-size: cover;
+    background-position: center;
 }
 .user .secondusers{
     height: 100%;
@@ -348,7 +349,7 @@ div :is(div .times){
     flex: 1 1 auto;
     display: flex;
     position:relative;
-    background-color: #eeeeeea7;
+    background-color: #eeeeee00;
     flex-direction: column;
 }
 .chatlies{

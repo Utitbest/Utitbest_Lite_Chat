@@ -22,15 +22,13 @@ const firebaseConfig = {
 
 const firebaseService = new FirebaseService(firebaseConfig);
 
-const firebaseApp = initializeApp(firebaseConfig); // Initialize Firebase
-// const storage = getStorage(firebaseApp)
+const firebaseApp = initializeApp(firebaseConfig);
 const auth = firebaseService.auth;
 const auth1 = getAuth(firebaseApp)
-let currentUserId = null; // Make sure user is logged in
+let currentUserId = null; 
 let otherUserId = null
 
 let chatId = null;
-// console.log(chatId)
 var contentdrop = document.querySelectorAll('.comeins i');
 var settings = document.querySelectorAll('.listOfcontents')
 var droplist = document.querySelector('.dropdown1')
@@ -178,8 +176,7 @@ async function loadAllUsers() {
         }
         users.forEach((user)  => {
                 if (user.id === currentUserId) {
-                    // console.log('Skipping current user from friends list:', currentUserId);
-                    return; // Skip to the next iteration
+                    return; 
                 }
 
                 const userElement = document.createElement("div");
@@ -237,8 +234,6 @@ async function loadAllUsers() {
                 });
                 secondusers.appendChild(userElement);
 
-            // }
-
         });
     } catch (error) {
         console.error("Error loading users:", error);
@@ -254,17 +249,17 @@ async function setUserProfilePicture(userId, userElement) {
 
     try {
         const profilePicUrl = await getDownloadURL(storageRef);
-        profileImg.src = profilePicUrl; // Set fetched profile picture
+        profileImg.src = profilePicUrl; 
     } catch (error) {
         if (error.code === 'storage/object-not-found') {
             const defaultPicUrl = await getDownloadURL(defaultRef);
 
-            profileImg.src = defaultPicUrl; // Set default profile picture
+            profileImg.src = defaultPicUrl; 
         } else {
             console.error('Error fetching profile picture:', error.message);
         }
     } finally {
-        spinner.style.display = 'none'; // Hide spinner
+        spinner.style.display = 'none'; 
     }
     
 }
