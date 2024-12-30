@@ -41,13 +41,12 @@ var chatInputText = document.querySelector('.inputing div input')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 let ActiveChat = null;
-const userprofileId = null;
+const userprofileId = document.querySelector('.signs');
 const AudioChat = document.querySelectorAll('.dropdown2 li')
     AudioChat[0].addEventListener('click', function(){
         alert('hllo ')
     })
 const maximum = 7;
-
 
 
 
@@ -211,6 +210,10 @@ async function loadAllUsers() {
 
                 const repumm = document.querySelector('.currentchatterinfor figure img')
                 userElement.addEventListener('click', async() => {
+                    if(userprofileId.classList.contains('dwells')){
+                        userprofileId.classList.remove('dwells');
+                        userprofileId.classList.add('naturea')
+                    }
                     otherUserId = user.id;
                     const storageRef = ref(firebaseService.storage, `profilePictures/${otherUserId}.jpg`);
                     const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`); 
@@ -476,10 +479,10 @@ sendbutton.addEventListener("click", async function () {
         if (messageContent){
             try {
                 await firebaseService.sendMessage(
-                    chatId, // Current chatId
-                    currentUserId, // Sender (logged-in user)
-                    otherUserId, // Recipient                    
-                    messageContent // Message content
+                    chatId,
+                    currentUserId, 
+                    otherUserId,            
+                    messageContent 
                 );
                 
                 chatInputText.value = ""; 
@@ -488,7 +491,11 @@ sendbutton.addEventListener("click", async function () {
             }
         }
 });
-
+window.addEventListener('keyup', (event) =>{
+    if(event.keyCode == 13){
+        sendbutton.click();
+    }
+})
 
 // To be continue////////////////////////////////////////////
 

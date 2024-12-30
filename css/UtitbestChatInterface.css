@@ -285,6 +285,21 @@ div :is(div .times){
     overflow: hidden;
     cursor: pointer;
 }
+.signs{
+    width:100%;
+    height:100%; 
+    position: absolute;
+    top: 0; 
+    left: 0; 
+    z-index: 20; 
+    background-color: #3f6bde;
+}
+.dwells{
+    display: flex;
+}
+.naturea{
+    display: none;
+}
 .currentchatterinfor figure img {
     height: inherit;
     width: inherit;
