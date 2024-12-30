@@ -335,19 +335,18 @@ getRelativeTime1(timestamp) {
  notifyUser12(senderId, message, messageId, chatId){
       const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
       const sww = userTag.querySelector('.times span .whatsappna')
-
       if(sww){
         if(!message.Status){
         // userTag.querySelector('.times span span').style.backgroundColor = '#0a70ea';
-          sww.style.backgroundColor = '#0a70ea'
+        // console.log(message.Status)
+          sww.style.backgroundColor = '#0a70ea';
         }else{
-          sww.style.backgroundColor = ''
+          sww.style.backgroundColor = '';
         }
       }
       // console.log(sww)
 
-      sww.addEventListener('click', () =>{
-        alert('ehh')
+      userTag.addEventListener('click', () =>{
         // if(!message.Status){
           sww.style.backgroundColor = '';
         // }

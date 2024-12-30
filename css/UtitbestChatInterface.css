@@ -335,8 +335,8 @@ div :is(div .times){
     align-items: center;
     justify-content: center;
     display: flex;
-    width: 0px;
-    height: 0px;
+    width: 10px;
+    height: 10px;
     /* background-color: #0a70ea; */
     color: white;
     border-radius: 50%;
