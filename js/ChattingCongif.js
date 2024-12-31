@@ -37,16 +37,15 @@ var iconsdem = document.querySelectorAll('.iconsdem span');
 var settingsPopup = document.querySelector('.settingsPopup')
 var secondusers = document.querySelector('.secondusers')
 var sendbutton = document.querySelector('.inputing div span')
-var chatInputText = document.querySelector('.inputing div input')
+var chatInputText = document.querySelector('#messageinput')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
+const appender = document.querySelector('.theInputsEtc .inputing')
 let ActiveChat = null;
 const userprofileId = document.querySelector('.signs');
-const AudioChat = document.querySelectorAll('.dropdown2 li')
-    AudioChat[0].addEventListener('click', function(){
-        alert('hllo ')
-    })
-const maximum = 7;
+const fileSelection = document.querySelector('.tochat')
+
+
 
 
 
@@ -446,7 +445,6 @@ async function initializeChat(chatId) {
                         <div>
                             <p>${message.content}</p>
                             <span class="finn">
-                                <i class="fa fa-check-double"></i>
                                 <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
                             </span>
                         </div>
@@ -475,7 +473,7 @@ async function initializeChat(chatId) {
 }
 
 sendbutton.addEventListener("click", async function () {
-        const messageContent = chatInputText.value.trim();
+        const messageContent = chatInputText.innerHTML.trim();
         if (messageContent){
             try {
                 await firebaseService.sendMessage(
@@ -485,10 +483,11 @@ sendbutton.addEventListener("click", async function () {
                     messageContent 
                 );
                 
-                chatInputText.value = ""; 
+                chatInputText.innerHTML = ""; 
             } catch (error) {
                 console.error("Error sending message:", error);
             }
+            chatInputText.innerHTML = "";
         }
 });
 window.addEventListener('keyup', (event) =>{
@@ -496,6 +495,89 @@ window.addEventListener('keyup', (event) =>{
         sendbutton.click();
     }
 })
+
+async function sendingFilesAsSMS(){
+    const vaildfilesize = 30 * 1024 * 1024;
+    fileSelection.addEventListener('change', function(event){
+    chatInputText.innerHTML = '';
+    chatInputText.setAttribute('contenteditable','false')
+    chatInputText.style.cursor = 'not-allowed'
+    let selecion = event.target.files[0];
+    const fileType = selecion.type.split('/')[0];
+    let PreviewAll = document.createElement('div')
+        PreviewAll.className = 'preview';
+    let exitIt = document.createElement('span')
+        exitIt.className = 'exiting'
+        exitIt.innerHTML = `
+            <i class="fa fa-xmark"></i>
+        `
+        exitIt.addEventListener('click', ()=>{
+            PreviewAll.remove()
+            fileSelection.value = ''
+            selecion = null
+        })
+    let tweek = document.createElement('div')
+        tweek.className = 'tweek';
+
+
+    if(!selecion){
+        firebaseService.showToast('Please select file.', 'error')
+        selecion = null
+        fileSelection.value = ''
+        return
+    }
+    if(selecion.size > vaildfilesize){
+        firebaseService.showToast('File size is greater than 30mb', 'error')
+        selecion = null
+        fileSelection.value = ''
+        return
+    }
+    
+    if(fileType === 'image'){
+        const reader = new FileReader()
+            reader.onload = function(e){
+                
+                tweek.innerHTML = `
+                    <img src="${e.target.result}" alt="Image preview" style="width:300px; heigth:90%">
+                    <p class="somep">${selecion.name}</p>
+                `
+            }
+            reader.readAsDataURL(selecion)
+    }else if(fileType === 'audio'){
+        const reader = new FileReader()
+            reader.onload = function(e){
+                tweek.innerHTML = `
+                    <audio src="${e.target.result}" flie.type="${selecion.type}" controls></audio>
+                    <p class="somep">${selecion.name}</p>
+                `
+            }
+            reader.readAsDataURL(selecion)
+    }else if(fileType === 'video'){
+        const reader = new FileReader()
+            reader.onload = function(e){
+                tweek.innerHTML = `
+                    <video src="${e.target.result}" flie.type="${selecion.type}" style="width:300px" heigth:90%; controls></video>
+                    <p class="somep">${selecion.name}</p>
+                `
+            }
+            reader.readAsDataURL(selecion)
+    }else{
+        tweek.innerHTML = `
+            <img src="./Super icons/Empty tag.png" alt="" style="width:100%; height:90%;">
+            <p class="somep">${selecion.name}</p>
+        `
+    }
+    PreviewAll.append(exitIt)
+    PreviewAll.append(tweek)
+    appender.append(PreviewAll);
+
+    
+
+})
+}
+
+sendingFilesAsSMS()
+
 
 // To be continue////////////////////////////////////////////
 

@@ -99,7 +99,7 @@ async getCurrentUserId() {
     }
   }
 
-  async registerUser(credentials, userData) {
+async registerUser(credentials, userData) {
     try {
       const { email, password } = credentials;
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
@@ -120,17 +120,17 @@ async getCurrentUserId() {
       this.showToast(`Error registering user: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
-  async getUserData(uid) {
+async getUserData(uid) {
     const userDoc = await getDoc(doc(this.db, "users", uid));
     if (userDoc.exists()) {
       return { id: userDoc.id, ...userDoc.data() }; // Return user data along with the ID
     } else {
       throw new Error("User not found");
     }
-  }
-  async loginUser(email, password) {
+}
+async loginUser(email, password) {
     try {
       const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
       this.showToast("Login successful!");
@@ -139,9 +139,9 @@ async getCurrentUserId() {
       this.showToast(`Error logging in: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
-  async getAllUsers() {
+async getAllUsers() {
     try {
         const usersSnapshot = await getDocs(collection(this.db, "users"));
         const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -276,7 +276,7 @@ async listenForMessages11() {
   }
 }
 
- notifyUser(userId, message) {
+notifyUser(userId, message) {
   const userTag = document.querySelector(`.individualchat[data-user-id="${userId}"]`)
   // console.log(userId, message)
 

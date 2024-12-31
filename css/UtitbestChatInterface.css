@@ -292,7 +292,6 @@ div :is(div .times){
     top: 0; 
     left: 0; 
     z-index: 20; 
-    background-color: #3f6bde;
 }
 .dwells{
     display: flex;
@@ -420,12 +419,10 @@ div :is(div .times){
     height: auto;
     width: 100%;
     font-size: .8em;
-    /* background-color:#7ad882; */
-    /* background-color:#7ad882; */
     background-color: #0a70ea;
     color:white;
     font-weight: 600;
-    padding: .6em;
+    padding: .8em .6em 1em .6em;
     flex-direction: column;
     border-top-left-radius: 2em;
     border-bottom-left-radius: 2em;
@@ -450,7 +447,6 @@ div :is(div .times){
 .theInputsEtc{
     height: 8%;
     width: 100%;
-    /* display: flex; */
     background-color: #eee;
 }
 .theInputsEtc .inputing{
@@ -459,18 +455,18 @@ div :is(div .times){
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 .theInputsEtc .inputing1{
     height: 100%;
     width: 20%;
-    /* display: flex; */
     align-items: center;
-    /* justify-content: space-evenly; */
 }
-.inputing div{
+.inputing .selmm{
     display: flex;
     height: 80%;
     width: inherit;
+    position: relative;
     align-items: center;
     justify-content: center;
     background-color: white;
@@ -478,7 +474,7 @@ div :is(div .times){
     overflow: hidden;
     box-shadow:-2px 2px 4px 0px #cbcbcb;
 }
-.inputing div p{
+.inputing .selmm .emojisicons{
     align-items: center;
     justify-content: center;
     display: flex;
@@ -493,20 +489,37 @@ div :is(div .times){
     -webkit-user-select: none;
     -moz-user-select: none;
 }
-.inputing div p:hover{
+.inputing .selmm p:hover{
     background-color: #d1e7dd;
     transition: background-color 0.3s ease;
 }
-.inputing div input{
+#messageinput1{
+    width: 80%;
+    height: 75%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+}
+#messageinput{
     outline: none;
     border: none;
-    height: 75%;
-    width: 80%;
+    height: 100%;
+    width: 100%;
     padding: 0 .5em;
     border-radius: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    max-width: 100%;
     background: none;
+    cursor: text;
+    display: flex;
+    align-items: center;
+    overflow-y: auto;
 }
-.inputing div span{
+.inputing .selmm span{
     font-size: 1.3em;
     color: white;
     margin-left: 1em;
@@ -521,7 +534,7 @@ div :is(div .times){
     -webkit-user-select: none;
     -moz-user-select: none;
 }
-.inputing div span i{
+.inputing .selmm span i{
     color: white;
 }
 .inputing1 i{
@@ -911,4 +924,45 @@ div :is(div .times){
 }
 .spnman11{
   display: none;
+}
+.somep{
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: .8em;
+    color: gray;
+    font-weight: 500;
+}
+.preview{
+    width: 400px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    justify-content: center;
+    padding: .5em .8em;
+    flex-direction: column;
+    overflow-y: auto;
+    transition: 1s linear;
+    background-color: #ffffff;
+    border-radius:.7em;
+    bottom: 3em;
+    right: 3em;
+}
+.exiting{
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 1%;
+    cursor: pointer;
+    position: absolute;
+    top: 1%;
+    background-color: #eee;
+}
+.tweek{
+    height: auto;
 }
