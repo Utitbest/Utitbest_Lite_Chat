@@ -40,6 +40,7 @@ var sendbutton = document.querySelector('.inputing div span')
 var chatInputText = document.querySelector('#messageinput')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
+let fon = document.querySelector('.res')
 const appender = document.querySelector('.theInputsEtc .inputing')
 let ActiveChat = null;
 const userprofileId = document.querySelector('.signs');
@@ -513,7 +514,13 @@ async function sendingFilesAsSMS(){
         `
         exitIt.addEventListener('click', ()=>{
             PreviewAll.remove()
-            fileSelection.value = ''
+            fileSelection.value = '';
+            chatInputText.setAttribute('contenteditable','true')
+            chatInputText.style.cursor = ''
+            fon.classList.remove('fa-bounce')
+            fon.style.transition = ''
+            fon.style.color ='';
+            sendbutton.style.background = ''
             selecion = null
         })
     let tweek = document.createElement('div')
@@ -524,12 +531,26 @@ async function sendingFilesAsSMS(){
         firebaseService.showToast('Please select file.', 'error')
         selecion = null
         fileSelection.value = ''
+        PreviewAll.remove()
+        chatInputText.setAttribute('contenteditable','true')
+        chatInputText.style.cursor = ''
+        fon.classList.remove('fa-bounce')
+        fon.style.transition = ''
+        fon.style.color ='';
+        sendbutton.style.background = ''
         return
     }
     if(selecion.size > vaildfilesize){
         firebaseService.showToast('File size is greater than 30mb', 'error')
         selecion = null
         fileSelection.value = ''
+        PreviewAll.remove()
+        chatInputText.setAttribute('contenteditable','true')
+        chatInputText.style.cursor = ''
+        fon.classList.remove('fa-bounce')
+        fon.style.transition = ''
+        fon.style.color ='';
+        sendbutton.style.background = ''
         return
     }
     
@@ -570,8 +591,93 @@ async function sendingFilesAsSMS(){
     PreviewAll.append(exitIt)
     PreviewAll.append(tweek)
     appender.append(PreviewAll);
-
+    fon.classList.add('fa-bounce')
+    fon.style.transition = '1s ease-out'
+    fon.style.color ='#0a70ea';
+    sendbutton.style.background = 'radial-gradient(#e0e0e0, #ffa2a2, #f497a7)'
     
+
+
+    // TO CONTINUE WITH THE SEND BUTTON ERROR FOR FIRING TWICE
+    sendbutton.addEventListener('click', async ()=>{
+        if(!selecion){
+            firebaseService.showToast('Please select file.', 'error')
+            selecion = null
+            fileSelection.value = ''
+            PreviewAll.remove()
+            chatInputText.setAttribute('contenteditable','true')
+            chatInputText.style.cursor = ''
+            fon.classList.remove('fa-bounce')
+            fon.style.transition = ''
+            fon.style.color ='';
+            sendbutton.style.background = ''
+            return
+        }
+        if(selecion.size > vaildfilesize){
+            firebaseService.showToast('File size is greater than 30mb', 'error')
+            selecion = null
+            fileSelection.value = ''
+            PreviewAll.remove()
+            chatInputText.setAttribute('contenteditable','true')
+            chatInputText.style.cursor = ''
+            fon.classList.remove('fa-bounce')
+            fon.style.transition = ''
+            fon.style.color ='';
+            sendbutton.style.background = ''    
+            return
+        }
+            try {
+                // Upload file to Firebase Storage
+                const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selection.name}`);
+                const uploadTask = await uploadBytes(storageRef, selecion);
+
+                // Get the file's download URL
+                const fileURL = await getDownloadURL(uploadTask.ref);
+
+                // Use sendMessage to save the file details in Firestore
+                const messageContent = {
+                    type: fileType,
+                    name: selecion.name,
+                    url: fileURL,
+                    size: selecion.size,
+                };
+
+                await firebaseService.sendMessage(chatId, senderId, recipientId, messageContent);
+
+                // Reset UI after successful upload
+                firebaseService.showToast('File sent successfully!', 'success');
+                PreviewAll.remove();
+                fileSelection.value = '';
+                chatInputText.setAttribute('contenteditable','true')
+                chatInputText.style.cursor = ''
+                fon.classList.remove('fa-bounce')
+                fon.style.transition = ''
+                fon.style.color ='';
+                sendbutton.style.background = ''
+            } catch (error) {
+                PreviewAll.remove();
+                fileSelection.value = '';
+                chatInputText.setAttribute('contenteditable','true')
+                chatInputText.style.cursor = ''
+                fon.classList.remove('fa-bounce')
+                fon.style.transition = ''
+                fon.style.color ='';
+                sendbutton.style.background = ''
+                firebaseService.showToast(`Error while sending file: ${error.message}`, 'error');
+            }
+            fon.style.color ='';
+            sendbutton.style.background = '';
+            PreviewAll.remove()
+            chatInputText.setAttribute('contenteditable','true')
+            chatInputText.style.cursor = ''
+            fon.classList.remove('fa-bounce')
+            fon.style.transition = ''
+    })
+    // /////////////////////////////////////
+    // firebaseService.sendMessage(chatId, senderId, recipientId, messageContent){
+        
+    // }
+
 
 })
 }

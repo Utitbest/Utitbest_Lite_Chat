@@ -88,7 +88,7 @@ async getCurrentUserId() {
     }
   }
 
-  async deleteDocument(collectionName, documentId) {
+async deleteDocument(collectionName, documentId) {
     try {
       const docRef = doc(this.db, collectionName, documentId);
       await deleteDoc(docRef);
