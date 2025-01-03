@@ -36,7 +36,7 @@ var containerRpy = document.querySelector('.contnet2')
 var iconsdem = document.querySelectorAll('.iconsdem span');
 var settingsPopup = document.querySelector('.settingsPopup')
 var secondusers = document.querySelector('.secondusers')
-var sendbutton = document.querySelector('.inputing div span')
+var sendbutton = document.querySelector('.inputing div button')
 var chatInputText = document.querySelector('#messageinput')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
@@ -473,8 +473,8 @@ async function initializeChat(chatId) {
     }
 }
 
-sendbutton.addEventListener("click", async function () {
-        const messageContent = chatInputText.innerHTML.trim();
+sendbutton.addEventListener("click", async function (){
+        const messageContent = chatInputText.value.trim();
         if (messageContent){
             try {
                 await firebaseService.sendMessage(
@@ -483,12 +483,13 @@ sendbutton.addEventListener("click", async function () {
                     otherUserId,            
                     messageContent 
                 );
+        console.log(chatId, currentUserId, otherUserId)
                 
-                chatInputText.innerHTML = ""; 
+                chatInputText.value = ""; 
             } catch (error) {
                 console.error("Error sending message:", error);
             }
-            chatInputText.innerHTML = "";
+            chatInputText.value = "";
         }
 });
 window.addEventListener('keyup', (event) =>{
@@ -497,12 +498,15 @@ window.addEventListener('keyup', (event) =>{
     }
 })
 
+
+// To be continue////////////////////////////////////////////
 async function sendingFilesAsSMS(){
     const vaildfilesize = 30 * 1024 * 1024;
     fileSelection.addEventListener('change', function(event){
-    chatInputText.innerHTML = '';
-    chatInputText.setAttribute('contenteditable','false')
+    chatInputText.value = '';
+    chatInputText.setAttribute('disabled', '')
     chatInputText.style.cursor = 'not-allowed'
+
     let selecion = event.target.files[0];
     const fileType = selecion.type.split('/')[0];
     let PreviewAll = document.createElement('div')
@@ -515,16 +519,19 @@ async function sendingFilesAsSMS(){
         exitIt.addEventListener('click', ()=>{
             PreviewAll.remove()
             fileSelection.value = '';
-            chatInputText.setAttribute('contenteditable','true')
             chatInputText.style.cursor = ''
-            fon.classList.remove('fa-bounce')
-            fon.style.transition = ''
-            fon.style.color ='';
-            sendbutton.style.background = ''
+            chatInputText.removeAttribute('disabled')
+            sendbutton.removeAttribute('disabled')
+            sendbutton.innerHTML = `
+                <i class="fa fa-paper-plane res"></i>
+            `
             selecion = null
         })
     let tweek = document.createElement('div')
         tweek.className = 'tweek';
+    let newsendbuds = document.createElement('button')
+        newsendbuds.className = 'newsendbuds';
+        newsendbuds.innerHTML = 'Send'
 
 
     if(!selecion){
@@ -532,12 +539,12 @@ async function sendingFilesAsSMS(){
         selecion = null
         fileSelection.value = ''
         PreviewAll.remove()
-        chatInputText.setAttribute('contenteditable','true')
         chatInputText.style.cursor = ''
-        fon.classList.remove('fa-bounce')
-        fon.style.transition = ''
-        fon.style.color ='';
-        sendbutton.style.background = ''
+        chatInputText.removeAttribute('disabled')
+        sendbutton.removeAttribute('disabled')
+        sendbutton.innerHTML = `
+            <i class="fa fa-paper-plane res"></i>
+        `
         return
     }
     if(selecion.size > vaildfilesize){
@@ -545,12 +552,12 @@ async function sendingFilesAsSMS(){
         selecion = null
         fileSelection.value = ''
         PreviewAll.remove()
-        chatInputText.setAttribute('contenteditable','true')
         chatInputText.style.cursor = ''
-        fon.classList.remove('fa-bounce')
-        fon.style.transition = ''
-        fon.style.color ='';
-        sendbutton.style.background = ''
+        chatInputText.removeAttribute('disabled')
+        sendbutton.removeAttribute('disabled')
+        sendbutton.innerHTML = `
+            <i class="fa fa-paper-plane res"></i>
+        `
         return
     }
     
@@ -590,27 +597,27 @@ async function sendingFilesAsSMS(){
     }
     PreviewAll.append(exitIt)
     PreviewAll.append(tweek)
+    PreviewAll.append(newsendbuds)
     appender.append(PreviewAll);
-    fon.classList.add('fa-bounce')
-    fon.style.transition = '1s ease-out'
-    fon.style.color ='#0a70ea';
-    sendbutton.style.background = 'radial-gradient(#e0e0e0, #ffa2a2, #f497a7)'
+    sendbutton.setAttribute('disabled', '')
+    sendbutton.innerHTML = `
+        <i class="fa fa-ban"></i>
+    `
     
 
 
-    // TO CONTINUE WITH THE SEND BUTTON ERROR FOR FIRING TWICE
-    sendbutton.addEventListener('click', async ()=>{
+    newsendbuds.addEventListener('click', async ()=>{
         if(!selecion){
             firebaseService.showToast('Please select file.', 'error')
             selecion = null
             fileSelection.value = ''
             PreviewAll.remove()
-            chatInputText.setAttribute('contenteditable','true')
             chatInputText.style.cursor = ''
-            fon.classList.remove('fa-bounce')
-            fon.style.transition = ''
-            fon.style.color ='';
-            sendbutton.style.background = ''
+            chatInputText.removeAttribute('disabled')
+            sendbutton.removeAttribute('disabled')
+            sendbutton.innerHTML = `
+                <i class="fa fa-paper-plane res"></i>
+            `
             return
         }
         if(selecion.size > vaildfilesize){
@@ -618,17 +625,17 @@ async function sendingFilesAsSMS(){
             selecion = null
             fileSelection.value = ''
             PreviewAll.remove()
-            chatInputText.setAttribute('contenteditable','true')
             chatInputText.style.cursor = ''
-            fon.classList.remove('fa-bounce')
-            fon.style.transition = ''
-            fon.style.color ='';
-            sendbutton.style.background = ''    
+            chatInputText.removeAttribute('disabled')
+            sendbutton.removeAttribute('disabled')
+            sendbutton.innerHTML = `
+                <i class="fa fa-paper-plane res"></i>
+            `  
             return
         }
             try {
                 // Upload file to Firebase Storage
-                const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selection.name}`);
+                const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
                 const uploadTask = await uploadBytes(storageRef, selecion);
 
                 // Get the file's download URL
@@ -665,26 +672,12 @@ async function sendingFilesAsSMS(){
                 sendbutton.style.background = ''
                 firebaseService.showToast(`Error while sending file: ${error.message}`, 'error');
             }
-            fon.style.color ='';
-            sendbutton.style.background = '';
-            PreviewAll.remove()
-            chatInputText.setAttribute('contenteditable','true')
-            chatInputText.style.cursor = ''
-            fon.classList.remove('fa-bounce')
-            fon.style.transition = ''
+           
     })
-    // /////////////////////////////////////
-    // firebaseService.sendMessage(chatId, senderId, recipientId, messageContent){
-        
-    // }
-
+   
 
 })
 }
-
-sendingFilesAsSMS()
-
-
 // To be continue////////////////////////////////////////////
 
 onAuthStateChanged(auth, (user) => {

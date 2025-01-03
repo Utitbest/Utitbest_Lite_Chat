@@ -519,7 +519,7 @@ div :is(div .times){
     align-items: center;
     overflow-y: auto;
 }
-.inputing .selmm span{
+.inputing .selmm button{
     font-size: 1.3em;
     color: white;
     margin-left: 1em;
@@ -531,10 +531,12 @@ div :is(div .times){
     display: flex;
     cursor: pointer;
     user-select: none;
+    outline: none;
+    border: none;
     -webkit-user-select: none;
     -moz-user-select: none;
 }
-.inputing .selmm span i{
+.inputing .selmm button i{
     color: white;
 }
 .inputing1 i{
@@ -612,6 +614,7 @@ div :is(div .times){
     left: -10em;
     border-radius: 10px;
     overflow: hidden;
+    z-index: 40;
     /* transition: 2s linear; */
 }
 .steeze{
@@ -965,4 +968,19 @@ div :is(div .times){
 }
 .tweek{
     height: auto;
+}
+.newsendbuds{
+    height: 30px;
+    width: 55px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: .5em;
+    align-items: center;
+    background-color: #3f6bde;
+    font-weight: 600;
+    border: none;
+    outline: none;
+    color: white;
+
 }
