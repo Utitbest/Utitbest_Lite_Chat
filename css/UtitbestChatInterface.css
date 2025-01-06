@@ -153,7 +153,6 @@ main .chat_area{
     font-size: .8em;
     padding: 13 10px;
     width: 90%;
-
 }
 .user .secondusers{
     height: 92%;
@@ -362,59 +361,22 @@ div :is(div .times){
     display: flex;
     height: auto;
 }
-.replyer .replyer1{
-    max-width: 50% !important;
-    display: flex;
-    height: auto;
-    align-items: flex-end;
-    justify-content: flex-end;
-    /* flex-direction: row; */
-    padding: .5em 1em;
-}
 
-.replyer1 span{
-    display: flex;
-    height: auto;
-    width: 100%;
-    font-size: .8em;
-    background-color: white;
-    color: rgb(95, 93, 93);
-    font-weight: 600;
-    padding: .6em;
-    justify-content: center;
-    flex-direction: column;
-    border-top-left-radius: 2em;
-    border-bottom-right-radius: 2em;
-    position: relative;
-    border-top-right-radius: 2em;
-}
-.replyer1 span p{
-    height: 90%;
-    width: 100%;
-}
-.replyer1 span h6{
-    height: 10%;
-    width: 100%;
-    text-align: right;
-    bottom: 1em;
-    right: 1em;
-    color: rgb(95, 93, 93);
-}
-
-.chatlies1 :is(div .user_response){
+.chatlies1 .user_response{
     height: auto;
     max-width: 100%;
     width: 100%;
     display: flex;
     justify-content: flex-end !important;
 }
-.user_response .user_response1{
+.flowsa{
     max-width: 50%;
     height: auto;
     display: flex;
     padding: .5em 1em;
+    /* background-color: #0a70ea; */
 }
-.user_response1 div{
+.flowsa0{ 
     display: flex;
     height: auto;
     width: 100%;
@@ -429,11 +391,40 @@ div :is(div .times){
     position: relative;
     border-top-right-radius: 2em;
 }
-.user_response1 div p{
+.flowsa0 p{
     height: 90%;
     width: 100%;
 }
-.user_response1  .finn{
+.flowsa0  h6{
+    display: flex;
+    width: 100%;
+    height: 10%;
+    justify-content: flex-end;
+    align-items: center;
+    text-align: right;
+    gap: 3px;
+}
+
+.flowsa1{ 
+    display: flex;
+    height: auto;
+    width: 100%;
+    font-size: .8em;
+    background-color: white;
+    color:rgb(95, 93, 93);
+    font-weight: 600;
+    padding: .8em .6em 1em .6em;
+    flex-direction: column;
+    border-top-left-radius: 2em;
+    border-bottom-left-radius: 2em;
+    position: relative;
+    border-top-right-radius: 2em;
+}
+.flowsa1 p{
+    height: 90%;
+    width: 100%;
+}
+.flowsa1  h6{
     display: flex;
     width: 100%;
     height: 10%;
@@ -968,6 +959,12 @@ div :is(div .times){
 }
 .tweek{
     height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 1em;
+    width: 100%;
+
 }
 .newsendbuds{
     height: 30px;
@@ -983,4 +980,17 @@ div :is(div .times){
     outline: none;
     color: white;
 
+}
+.animationprogress{
+    height: 50px;
+    width: 0;
+    display: inline-block;
+    border-radius: 10px;
+    transition: 1s linear;
+    background-color: #3f6bde;
+    position: relative;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
 }

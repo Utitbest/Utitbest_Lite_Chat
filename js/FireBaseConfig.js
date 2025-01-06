@@ -214,22 +214,19 @@ async listenForMessages(chatId, callback) {
       onSnapshot(q, (snapshot) => {
           const messages = snapshot.docs.map((doc) => {
               const data = doc.data();
-              // console.log("New message added: ", data);
-              // Ensure the timestamp field exists and is valid
+             
               const validTimestamp = data.timestamp || { seconds: 0, nanoseconds: 0 };
 
               return {
                   id: doc.id,
                   ...data,
-                  timestamp: validTimestamp || null, // Provide default if missing
+                  timestamp: validTimestamp || null, 
               };
           });
 
-          // Pass the messages to the callback function
           callback(messages);
       });
   } catch (error) {
-      // console.error("Error listening for messages:", error);
       this.showToast(`Error listening for message: ${error}`);
   }
 }
@@ -278,27 +275,35 @@ async listenForMessages11() {
 
 notifyUser(userId, message) {
   const userTag = document.querySelector(`.individualchat[data-user-id="${userId}"]`)
-  // console.log(userId, message)
 
   if (userTag) {
     userTag.querySelector(".username_chat p").textContent = message.content;
+
+    if(typeof message.content === 'string') {
+      userTag.querySelector(".username_chat p").textContent = message.content;
+    }else if (message.content?.type) {
+      userTag.querySelector(".username_chat p").textContent = `${message.content.type.toUpperCase()} File Sent`;
+    }else {
+      userTag.querySelector(".username_chat p").textContent = 'Unknown Message Type';
+    }
+
     let abi;
     if (message.timestamp && message.timestamp.seconds) {
-      abi = message.timestamp.seconds; // Firestore Timestamp
+      abi = message.timestamp.seconds; 
     } else if (message.timestamp && message.timestamp.toDate()) {
       abi = Math.floor(message.timestamp.toDate().getTime() / 1000); // Convert to seconds
     } else {
       abi = Math.floor(Date.now() / 1000);
-      console.warn("Invalid or missing timestamp:", message.timestamp);
     }
     userTag.querySelector('.times p').textContent = this.getRelativeTime1(abi);
     if(userTag.querySelector('.times p').textContent.length > 7){
       userTag.querySelector('.times p').textContent = userTag.querySelector('.times p').textContent.slice(0, 7) + '...';
     }
     const userlist = document.querySelector('.secondusers')
-    if(userlist){
-      userlist.removeChild(userTag)
-      userlist.prepend(userTag)
+    
+    if(userlist && userlist.firstElementChild !== userTag) {
+      userlist.removeChild(userTag);
+      userlist.prepend(userTag);
     }
   } else {
     console.warn(`User tag for sender ${userId} not found.`);

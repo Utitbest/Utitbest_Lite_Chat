@@ -2,7 +2,7 @@ import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/fi
 import FirebaseService from './FireBaseConfig.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js";
 import { getFirestore, collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc, onSnapshot, where, serverTimestamp, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/9.18.0/firebase-firestore.js';
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject, getMetadata,} from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL, deleteObject, getMetadata,} from "https://www.gstatic.com/firebasejs/9.18.0/firebase-storage.js";
 
 
 
@@ -195,7 +195,7 @@ async function loadAllUsers() {
                         <div style="display: flex; align-items: center; width: 80%; height: 100%;">
                             <div class="username_chat">
                                 <h3>${user.firstname + ' '+ user.lastname}</h3>
-                                <p>Last message preview</p>
+                                <p>Start chatting now!</p>
                             </div>
                             <div class="times">
                                 <p>20:30</p>
@@ -233,6 +233,7 @@ async function loadAllUsers() {
                     chatId = [currentUserId, otherUserId].sort().join('_'); 
                     Chatterinfordisply.innerHTML = user.firstname + user.lastname;
                     initializeChat(chatId); 
+                    sendingFilesAsSMS(chatId, currentUserId, otherUserId)
                     
                 });
                 secondusers.appendChild(userElement);
@@ -405,6 +406,75 @@ async function profileDisplayer() {
 }
 await profileDisplayer()
 
+
+
+
+async function initializeChat(chatId) {
+    try {
+        ActiveChat = chatId;
+        chatlies1.innerHTML = "";
+
+        firebaseService.listenForMessages(chatId, (messages) => {
+            if (chatId !== ActiveChat) return; 
+            chatlies1.innerHTML = ""; 
+
+            messages.forEach((message) => {
+                const messageElement = document.createElement("div");
+                const messageElement1 = document.createElement("div");
+                const messageElement2 = document.createElement("div");
+                
+                const user_response = message.senderId === currentUserId;
+
+                if (user_response) {
+                    messageElement.className = 'user_response';
+                    messageElement1.className = 'flowsa';
+                    messageElement2.className = 'flowsa0';
+                } else {
+                    messageElement.className = 'replyer';
+                    messageElement1.className = 'flowsa';
+                    messageElement2.className = 'flowsa1';
+                }
+
+                // Handling different message types
+                if (typeof message.content === 'string'){
+                    messageElement2.innerHTML = `
+                        <p>${message.content}</p>
+                        <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
+                    `;
+                } else if (message.content?.type === 'image') {
+                    messageElement2.innerHTML = `
+                        <img src="${message.content.url}" alt="${message.content.name}" style="max-width:300px; border-radius:1em;">
+                        <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
+                    `;
+                } else if (message.content?.type === 'video') {
+                    messageElement2.innerHTML = `
+                        <video src="${message.content.url}" controls style="max-width:300px; border-radius:1em;"></video>
+                        <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
+                    `;
+                } else if (message.content?.type === 'audio') {
+                    messageElement2.innerHTML = `
+                        <audio src="${message.content.url}" style="height:40px; margin-bottom:.5em;" controls></audio>
+                        <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
+                    `;
+                } else {
+                    messageElement2.innerHTML = `
+                        <a href="${message.content.url}" target="_blank">${message.content.name}</a>
+                        <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
+                    `;
+                }
+                messageElement1.append(messageElement2);
+                messageElement.append(messageElement1);
+                chatlies1.appendChild(messageElement);
+            });
+
+            // Scroll to the latest message
+            chatlies1.scrollTop = chatlies1.scrollHeight;
+        });
+    } catch (error) {
+        console.error("Error initializing chat:", error);
+    }
+}
+
 function getRelativeTime(timestamp) {
     const currentTime = new Date();
     const messageTime = new Date(timestamp * 1000); // Convert seconds to milliseconds
@@ -427,51 +497,6 @@ function getRelativeTime(timestamp) {
     return `Just now`; 
 }
 
-async function initializeChat(chatId) {
-    try {
-        ActiveChat = chatId;
-        chatlies1.innerHTML = "";
-
-        firebaseService.listenForMessages(chatId, (messages) => {
-            if(chatId !== ActiveChat) return;
-            chatlies1.innerHTML = ""; 
-
-            messages.forEach((message) => {
-                const messageElement = document.createElement("div");
-                const user_reponse = message.senderId === currentUserId;
-                if(user_reponse){
-                    messageElement.className = 'user_response';
-                    messageElement.innerHTML = `
-                    <div class="user_response1">
-                        <div>
-                            <p>${message.content}</p>
-                            <span class="finn">
-                                <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
-                            </span>
-                        </div>
-                    </div>
-                    `;
-                }else{
-                    messageElement.className = 'replyer';
-                    messageElement.innerHTML = `
-                    <div class="replyer1">
-                        <span>
-                            <p>${message.content}</p>
-                            <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
-                        </span>
-                    </div>
-                    `;
-                }
-                chatlies1.appendChild(messageElement);
-            });
-
-            // Scroll to the latest message
-            chatlies1.scrollTop = chatlies1.scrollHeight;
-        });
-    } catch (error) {
-        console.error("Error initializing chat:", error);
-    }
-}
 
 sendbutton.addEventListener("click", async function (){
         const messageContent = chatInputText.value.trim();
@@ -483,7 +508,7 @@ sendbutton.addEventListener("click", async function (){
                     otherUserId,            
                     messageContent 
                 );
-        console.log(chatId, currentUserId, otherUserId)
+        // console.log(chatId+ '   '+ currentUserId+ '   '+  otherUserId)
                 
                 chatInputText.value = ""; 
             } catch (error) {
@@ -498,11 +523,11 @@ window.addEventListener('keyup', (event) =>{
     }
 })
 
-
-// To be continue////////////////////////////////////////////
-async function sendingFilesAsSMS(){
-    const vaildfilesize = 30 * 1024 * 1024;
+async function sendingFilesAsSMS(chatId, senderId, recipientId){
+    const vaildfilesize = 10 * 1024 * 1024;
+    
     fileSelection.addEventListener('change', function(event){
+    document.querySelectorAll('.preview').forEach(preview => preview.remove());
     chatInputText.value = '';
     chatInputText.setAttribute('disabled', '')
     chatInputText.style.cursor = 'not-allowed'
@@ -511,13 +536,14 @@ async function sendingFilesAsSMS(){
     const fileType = selecion.type.split('/')[0];
     let PreviewAll = document.createElement('div')
         PreviewAll.className = 'preview';
+    
     let exitIt = document.createElement('span')
         exitIt.className = 'exiting'
         exitIt.innerHTML = `
             <i class="fa fa-xmark"></i>
         `
         exitIt.addEventListener('click', ()=>{
-            PreviewAll.remove()
+            document.querySelectorAll('.preview').forEach(preview => preview.remove());
             fileSelection.value = '';
             chatInputText.style.cursor = ''
             chatInputText.removeAttribute('disabled')
@@ -529,16 +555,18 @@ async function sendingFilesAsSMS(){
         })
     let tweek = document.createElement('div')
         tweek.className = 'tweek';
+    let animationprogress = document.createElement('div')
+        animationprogress.className = 'animationprogress'
     let newsendbuds = document.createElement('button')
         newsendbuds.className = 'newsendbuds';
-        newsendbuds.innerHTML = 'Send'
+        newsendbuds.innerHTML = 'Send';
 
 
     if(!selecion){
         firebaseService.showToast('Please select file.', 'error')
         selecion = null
         fileSelection.value = ''
-        PreviewAll.remove()
+        document.querySelectorAll('.preview').forEach(preview => preview.remove());
         chatInputText.style.cursor = ''
         chatInputText.removeAttribute('disabled')
         sendbutton.removeAttribute('disabled')
@@ -548,10 +576,10 @@ async function sendingFilesAsSMS(){
         return
     }
     if(selecion.size > vaildfilesize){
-        firebaseService.showToast('File size is greater than 30mb', 'error')
+        firebaseService.showToast('File size is greater than 10mb', 'error')
         selecion = null
         fileSelection.value = ''
-        PreviewAll.remove()
+        document.querySelectorAll('.preview').forEach(preview => preview.remove());
         chatInputText.style.cursor = ''
         chatInputText.removeAttribute('disabled')
         sendbutton.removeAttribute('disabled')
@@ -595,89 +623,210 @@ async function sendingFilesAsSMS(){
             <p class="somep">${selecion.name}</p>
         `
     }
-    PreviewAll.append(exitIt)
-    PreviewAll.append(tweek)
-    PreviewAll.append(newsendbuds)
+
+    PreviewAll.append(exitIt, tweek, newsendbuds)
     appender.append(PreviewAll);
     sendbutton.setAttribute('disabled', '')
     sendbutton.innerHTML = `
         <i class="fa fa-ban"></i>
     `
     
+    // newsendbuds.addEventListener('click', async ()=>{
+    //     if(!selecion){
+    //         firebaseService.showToast('Please select file.', 'error')
+    //         selecion = null
+    //         fileSelection.value = ''
+    //         document.querySelectorAll('.preview').forEach(preview => preview.remove());
+    //         chatInputText.style.cursor = ''
+    //         chatInputText.removeAttribute('disabled')
+    //         sendbutton.removeAttribute('disabled')
+    //         sendbutton.innerHTML = `
+    //             <i class="fa fa-paper-plane res"></i>
+    //         `
+    //         return
+    //     }
+    //     if(selecion.size > vaildfilesize){
+    //         firebaseService.showToast('File size is greater than 30mb', 'error')
+    //         selecion = null
+    //         fileSelection.value = ''
+    //         document.querySelectorAll('.preview').forEach(preview => preview.remove());
+    //         chatInputText.style.cursor = ''
+    //         chatInputText.removeAttribute('disabled')
+    //         sendbutton.removeAttribute('disabled')
+    //         sendbutton.innerHTML = `
+    //             <i class="fa fa-paper-plane res"></i>
+    //         `  
+    //         return
+    //     }
+    //         try {
+    //             const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
+    //             const uploadTask = await uploadBytes(storageRef, selecion);
+    //             // const uploadTask = await uploadBytesResumable(storageRef, selecion);
 
+    //             uploadTask.on('state_changed', (snapshot) => {
+    //                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    //                 tweek.innerHTML = `
+    //                     <span style="width:${progress}$; height: 50px; display:inline-block;"></span>
+    //                 `
+    //             });
+    //             console.log(uploadTask)
+    //             const fileURL = await getDownloadURL(uploadTask.ref);
 
-    newsendbuds.addEventListener('click', async ()=>{
-        if(!selecion){
-            firebaseService.showToast('Please select file.', 'error')
-            selecion = null
-            fileSelection.value = ''
-            PreviewAll.remove()
-            chatInputText.style.cursor = ''
-            chatInputText.removeAttribute('disabled')
-            sendbutton.removeAttribute('disabled')
+    //             const messageContent = {
+    //                 type: fileType,
+    //                 name: selecion.name,
+    //                 url: fileURL,
+    //                 size: selecion.size,
+    //             };
+
+    //             await firebaseService.sendMessage(chatId, senderId, recipientId, messageContent);
+
+                
+    //             firebaseService.showToast('File sent successfully!', 'success');
+    //             selecion = null
+    //             document.querySelectorAll('.preview').forEach(preview => preview.remove());
+    //             fileSelection.value = ''
+    //             chatInputText.style.cursor = ''
+    //             chatInputText.removeAttribute('disabled')
+    //             sendbutton.removeAttribute('disabled')
+    //             sendbutton.innerHTML = `
+    //                 <i class="fa fa-paper-plane res"></i>
+    //             ` 
+    //         } catch(error){
+    //             firebaseService.showToast(`Error while sending file: ${error.message}`, 'error');
+    //             try {
+    //                 const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
+    //                 await deleteObject(storageRef);
+    //                 firebaseService.showToast('File successfully deleted due to error.', 'success');
+    //                 console.log("File successfully deleted due to error.");
+    //             } catch (error) {
+    //                 console.error("Error deleting file: ", error.message);
+    //             }
+    //             selecion = null
+    //             fileSelection.value = ''
+    //             document.querySelectorAll('.preview').forEach(preview => preview.remove());
+    //             chatInputText.style.cursor = ''
+    //             chatInputText.removeAttribute('disabled')
+    //             sendbutton.removeAttribute('disabled')
+    //             sendbutton.innerHTML = `
+    //                 <i class="fa fa-paper-plane res"></i>
+    //             ` 
+    //         }
+           
+    // })
+    newsendbuds.addEventListener('click', async () => {
+        if (!selecion) {
+            firebaseService.showToast('Please select file.', 'error');
+            selecion = null;
+            fileSelection.value = '';
+            document.querySelectorAll('.preview').forEach(preview => preview.remove());
+            chatInputText.style.cursor = '';
+            chatInputText.removeAttribute('disabled');
+            sendbutton.removeAttribute('disabled');
             sendbutton.innerHTML = `
                 <i class="fa fa-paper-plane res"></i>
-            `
-            return
+            `;
+            return;
         }
-        if(selecion.size > vaildfilesize){
-            firebaseService.showToast('File size is greater than 30mb', 'error')
-            selecion = null
-            fileSelection.value = ''
-            PreviewAll.remove()
-            chatInputText.style.cursor = ''
-            chatInputText.removeAttribute('disabled')
-            sendbutton.removeAttribute('disabled')
+    
+        if (selecion.size > vaildfilesize) {
+            firebaseService.showToast('File size is greater than 10mb', 'error');
+            selecion = null;
+            fileSelection.value = '';
+            document.querySelectorAll('.preview').forEach(preview => preview.remove());
+            chatInputText.style.cursor = '';
+            chatInputText.removeAttribute('disabled');
+            sendbutton.removeAttribute('disabled');
             sendbutton.innerHTML = `
                 <i class="fa fa-paper-plane res"></i>
-            `  
-            return
+            `;
+            return;
         }
-            try {
-                // Upload file to Firebase Storage
-                const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
-                const uploadTask = await uploadBytes(storageRef, selecion);
-
-                // Get the file's download URL
-                const fileURL = await getDownloadURL(uploadTask.ref);
-
-                // Use sendMessage to save the file details in Firestore
+    
+        try {
+            const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
+            const uploadTask = uploadBytesResumable(storageRef, selecion);
+            uploadTask.on('state_changed', (snapshot) => {
+                tweek.innerHTML = '';
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                animationprogress.style.width = progress + '%';
+                const Roundup = Math.floor(progress)
+                animationprogress.innerHTML = 'Uploading file please wait..'+ ' ' + Roundup + '%';
+                tweek.append(animationprogress);
+            }, async (error) => {
+                firebaseService.showToast(`Upload failed: ${error.message}`, 'error');
+                
+                try {
+                    await deleteObject(uploadTask.snapshot.ref); 
+                    console.log("File successfully deleted due to error.");
+                } catch (deleteError) {
+                    console.error("Error deleting file: ", deleteError.message);
+                }
+    
+                // Cleanup and reset UI
+                selecion = null;
+                fileSelection.value = '';
+                document.querySelectorAll('.preview').forEach(preview => preview.remove());
+                chatInputText.style.cursor = '';
+                chatInputText.removeAttribute('disabled');
+                sendbutton.removeAttribute('disabled');
+                sendbutton.innerHTML = `
+                    <i class="fa fa-paper-plane res"></i>
+                `;
+            }, async () => {
+                const fileURL = await getDownloadURL(uploadTask.snapshot.ref);
                 const messageContent = {
                     type: fileType,
                     name: selecion.name,
                     url: fileURL,
                     size: selecion.size,
                 };
-
+    
                 await firebaseService.sendMessage(chatId, senderId, recipientId, messageContent);
-
-                // Reset UI after successful upload
+    
                 firebaseService.showToast('File sent successfully!', 'success');
-                PreviewAll.remove();
+                selecion = null;
+                document.querySelectorAll('.preview').forEach(preview => preview.remove());
                 fileSelection.value = '';
-                chatInputText.setAttribute('contenteditable','true')
-                chatInputText.style.cursor = ''
-                fon.classList.remove('fa-bounce')
-                fon.style.transition = ''
-                fon.style.color ='';
-                sendbutton.style.background = ''
-            } catch (error) {
-                PreviewAll.remove();
-                fileSelection.value = '';
-                chatInputText.setAttribute('contenteditable','true')
-                chatInputText.style.cursor = ''
-                fon.classList.remove('fa-bounce')
-                fon.style.transition = ''
-                fon.style.color ='';
-                sendbutton.style.background = ''
-                firebaseService.showToast(`Error while sending file: ${error.message}`, 'error');
+                chatInputText.style.cursor = '';
+                chatInputText.removeAttribute('disabled');
+                sendbutton.removeAttribute('disabled');
+                sendbutton.innerHTML = `
+                    <i class="fa fa-paper-plane res"></i>
+                `;
+            });
+    
+        } catch (error) {
+            firebaseService.showToast(`Error while sending file: ${error.message}`, 'error');
+            
+            // Ensure deletion if any error occurs
+            try {
+                const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
+                await deleteObject(storageRef); // Use the correct reference for deletion
+                console.log("File successfully deleted due to error.");
+            } catch (deleteError) {
+                console.error("Error deleting file: ", deleteError.message);
             }
-           
-    })
+    
+            selecion = null;
+            fileSelection.value = '';
+            document.querySelectorAll('.preview').forEach(preview => preview.remove());
+            chatInputText.style.cursor = '';
+            chatInputText.removeAttribute('disabled');
+            sendbutton.removeAttribute('disabled');
+            sendbutton.innerHTML = `
+                <i class="fa fa-paper-plane res"></i>
+            `;
+        }
+    });
+    
    
 
-})
+    })
+
 }
+
+
 // To be continue////////////////////////////////////////////
 
 onAuthStateChanged(auth, (user) => {
@@ -774,7 +923,7 @@ async function logoutUser() {
       window.location.href = './indexLogin.html';
     }catch(error) {
       console.error('Error logging out:', error);
-      alert('Failed to log out. Please try again.');
+    //   alert('Failed to log out. Please try again.');
     }
 }
   
@@ -841,8 +990,6 @@ function FreashOff(){
             totori.remove()
         }, 9000)
 }
-
-
 ContentDrop()
 HideSettings()
 document.addEventListener("DOMContentLoaded", loadAllUsers())
