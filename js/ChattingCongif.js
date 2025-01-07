@@ -195,10 +195,10 @@ async function loadAllUsers() {
                         <div style="display: flex; align-items: center; width: 80%; height: 100%;">
                             <div class="username_chat">
                                 <h3>${user.firstname + ' '+ user.lastname}</h3>
-                                <p>Start chatting now!</p>
+                                <p></p>
                             </div>
                             <div class="times">
-                                <p>20:30</p>
+                                <p></p>
                                 <span>
                                     <span class="whatsappna"></span>
                                 </span>
@@ -241,6 +241,7 @@ async function loadAllUsers() {
         });
     } catch (error) {
         console.error("Error loading users:", error);
+        firebaseService.showToast(`Error loading users: ${error.message}`, 'error');
     }
 } 
 
@@ -508,7 +509,6 @@ sendbutton.addEventListener("click", async function (){
                     otherUserId,            
                     messageContent 
                 );
-        // console.log(chatId+ '   '+ currentUserId+ '   '+  otherUserId)
                 
                 chatInputText.value = ""; 
             } catch (error) {
@@ -631,89 +631,6 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
         <i class="fa fa-ban"></i>
     `
     
-    // newsendbuds.addEventListener('click', async ()=>{
-    //     if(!selecion){
-    //         firebaseService.showToast('Please select file.', 'error')
-    //         selecion = null
-    //         fileSelection.value = ''
-    //         document.querySelectorAll('.preview').forEach(preview => preview.remove());
-    //         chatInputText.style.cursor = ''
-    //         chatInputText.removeAttribute('disabled')
-    //         sendbutton.removeAttribute('disabled')
-    //         sendbutton.innerHTML = `
-    //             <i class="fa fa-paper-plane res"></i>
-    //         `
-    //         return
-    //     }
-    //     if(selecion.size > vaildfilesize){
-    //         firebaseService.showToast('File size is greater than 30mb', 'error')
-    //         selecion = null
-    //         fileSelection.value = ''
-    //         document.querySelectorAll('.preview').forEach(preview => preview.remove());
-    //         chatInputText.style.cursor = ''
-    //         chatInputText.removeAttribute('disabled')
-    //         sendbutton.removeAttribute('disabled')
-    //         sendbutton.innerHTML = `
-    //             <i class="fa fa-paper-plane res"></i>
-    //         `  
-    //         return
-    //     }
-    //         try {
-    //             const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
-    //             const uploadTask = await uploadBytes(storageRef, selecion);
-    //             // const uploadTask = await uploadBytesResumable(storageRef, selecion);
-
-    //             uploadTask.on('state_changed', (snapshot) => {
-    //                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    //                 tweek.innerHTML = `
-    //                     <span style="width:${progress}$; height: 50px; display:inline-block;"></span>
-    //                 `
-    //             });
-    //             console.log(uploadTask)
-    //             const fileURL = await getDownloadURL(uploadTask.ref);
-
-    //             const messageContent = {
-    //                 type: fileType,
-    //                 name: selecion.name,
-    //                 url: fileURL,
-    //                 size: selecion.size,
-    //             };
-
-    //             await firebaseService.sendMessage(chatId, senderId, recipientId, messageContent);
-
-                
-    //             firebaseService.showToast('File sent successfully!', 'success');
-    //             selecion = null
-    //             document.querySelectorAll('.preview').forEach(preview => preview.remove());
-    //             fileSelection.value = ''
-    //             chatInputText.style.cursor = ''
-    //             chatInputText.removeAttribute('disabled')
-    //             sendbutton.removeAttribute('disabled')
-    //             sendbutton.innerHTML = `
-    //                 <i class="fa fa-paper-plane res"></i>
-    //             ` 
-    //         } catch(error){
-    //             firebaseService.showToast(`Error while sending file: ${error.message}`, 'error');
-    //             try {
-    //                 const storageRef = ref(firebaseService.storage, `chatFiles/${chatId}/${Date.now()}_${selecion.name}`);
-    //                 await deleteObject(storageRef);
-    //                 firebaseService.showToast('File successfully deleted due to error.', 'success');
-    //                 console.log("File successfully deleted due to error.");
-    //             } catch (error) {
-    //                 console.error("Error deleting file: ", error.message);
-    //             }
-    //             selecion = null
-    //             fileSelection.value = ''
-    //             document.querySelectorAll('.preview').forEach(preview => preview.remove());
-    //             chatInputText.style.cursor = ''
-    //             chatInputText.removeAttribute('disabled')
-    //             sendbutton.removeAttribute('disabled')
-    //             sendbutton.innerHTML = `
-    //                 <i class="fa fa-paper-plane res"></i>
-    //             ` 
-    //         }
-           
-    // })
     newsendbuds.addEventListener('click', async () => {
         if (!selecion) {
             firebaseService.showToast('Please select file.', 'error');

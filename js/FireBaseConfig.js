@@ -336,12 +336,14 @@ getRelativeTime1(timestamp) {
 
 }
 
- notifyUser12(senderId, message, messageId, chatId){
+notifyUser12(senderId, message, messageId, chatId){
       const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
       const sww = userTag.querySelector('.times span .whatsappna')
+      const notify = new Audio('./preview.mp3')
       if(sww){
         if(!message.Status){
           sww.style.backgroundColor = '#0a70ea';
+          notify.play()
         }else{
           sww.style.backgroundColor = '';
         }

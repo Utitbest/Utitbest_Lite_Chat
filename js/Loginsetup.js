@@ -59,12 +59,10 @@ function Validation(){
 
             try{
                 const userId = await firebaseService.loginUser(Email.value, password.value);
-                console.log("Logged in user ID:", userId);
-            
                 window.location.href = './UtitbestChatInterface.html';
             }catch(error){
                 console.error("Error during login:", error);
-                alert("Login failed: " + error.message);
+                firebaseService.showToast(`Error loggin users: check your internet connection`, 'error');
             }
             password.value = '';
             Email.value = '';
