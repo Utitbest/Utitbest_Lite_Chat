@@ -340,19 +340,20 @@ notifyUser12(senderId, message, messageId, chatId){
       const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
       const sww = userTag.querySelector('.times span .whatsappna')
       const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
-      if(sww){
+      if(userTag){
         if(!message.Status){
           sww.style.backgroundColor = '#0a70ea';
           notify.play()
         }else{
           sww.style.backgroundColor = '';
         }
-      }
+      
 
       userTag.addEventListener('click', () =>{
         sww.style.backgroundColor = '';
         this.markMessageAsSeen(chatId, messageId);
       })
+    }
     
 }
 
