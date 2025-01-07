@@ -286,7 +286,6 @@ notifyUser(userId, message) {
     }else {
       userTag.querySelector(".username_chat p").textContent = 'Unknown Message Type';
     }
-
     let abi;
     if (message.timestamp && message.timestamp.seconds) {
       abi = message.timestamp.seconds; 
@@ -337,10 +336,11 @@ getRelativeTime1(timestamp) {
 }
 
 notifyUser12(senderId, message, messageId, chatId){
+      const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
+
       const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
       const sww = userTag.querySelector('.times span .whatsappna')
-      const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
-      if(userTag){
+      if(sww){
         if(!message.Status){
           sww.style.backgroundColor = '#0a70ea';
           notify.play()
@@ -348,12 +348,11 @@ notifyUser12(senderId, message, messageId, chatId){
           sww.style.backgroundColor = '';
         }
       
-
+      }
       userTag.addEventListener('click', () =>{
         sww.style.backgroundColor = '';
         this.markMessageAsSeen(chatId, messageId);
       })
-    }
     
 }
 
