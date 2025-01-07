@@ -339,7 +339,7 @@ getRelativeTime1(timestamp) {
 notifyUser12(senderId, message, messageId, chatId){
       const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
       const sww = userTag.querySelector('.times span .whatsappna')
-      const notify = new Audio('./preview.mp3')
+      const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
       if(sww){
         if(!message.Status){
           sww.style.backgroundColor = '#0a70ea';
