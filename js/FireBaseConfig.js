@@ -105,12 +105,11 @@ async registerUser(credentials, userData) {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       const userId = userCredential.user.uid;
 
-      // Store user data in Firestore using UID as document ID
       await setDoc(doc(this.db, "users", userId), {
         uid: userId,
         ...userData,
-        isActive: false,
-        lastActive: serverTimestamp(),
+        // isActive: true,
+        // lastActive: serverTimestamp(),
         createdAt: new Date()
       });
 
@@ -374,6 +373,5 @@ async markMessageAsSeen(chatId, messageId) {
     this.showToast(`Error marking message as seen: ${error}`);
   }
 }
-
 
 }

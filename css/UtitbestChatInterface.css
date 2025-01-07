@@ -416,7 +416,7 @@ div :is(div .times){
     padding: .8em .6em 1em .6em;
     flex-direction: column;
     border-top-left-radius: 2em;
-    border-bottom-left-radius: 2em;
+    border-bottom-right-radius: 2em;
     position: relative;
     border-top-right-radius: 2em;
 }
@@ -964,7 +964,6 @@ div :is(div .times){
     justify-content: center;
     margin-bottom: 1em;
     width: 100%;
-
 }
 .newsendbuds{
     height: 30px;

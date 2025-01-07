@@ -407,9 +407,6 @@ async function profileDisplayer() {
 }
 await profileDisplayer()
 
-
-
-
 async function initializeChat(chatId) {
     try {
         ActiveChat = chatId;
@@ -475,7 +472,6 @@ async function initializeChat(chatId) {
         console.error("Error initializing chat:", error);
     }
 }
-
 function getRelativeTime(timestamp) {
     const currentTime = new Date();
     const messageTime = new Date(timestamp * 1000); // Convert seconds to milliseconds
@@ -497,8 +493,6 @@ function getRelativeTime(timestamp) {
     if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
     return `Just now`; 
 }
-
-
 sendbutton.addEventListener("click", async function (){
         const messageContent = chatInputText.value.trim();
         if (messageContent){
@@ -522,7 +516,6 @@ window.addEventListener('keyup', (event) =>{
         sendbutton.click();
     }
 })
-
 async function sendingFilesAsSMS(chatId, senderId, recipientId){
     const vaildfilesize = 10 * 1024 * 1024;
     
@@ -746,64 +739,11 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
 
 // To be continue////////////////////////////////////////////
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        const userId = user.uid;
 
-        // Add online/offline listeners
-        window.addEventListener("online", () => {
-            console.log("Online event triggered");
-            updateUserStatus(userId, true);
-        });
 
-        window.addEventListener("offline", () => {
-            console.log("Offline event triggered");
-            updateUserStatus(userId, false);
-        });
 
-        // Start listening for real-time user status updates
-        listenForUserStatusUpdates();
-    }
-});
 
-async function updateUserStatus(userId, isActive) {
-    const userRef = doc(firebaseService.db, "users", userId);
-    try {
-        console.log(`Updating status for ${userId}: ${isActive}`);
-        await updateDoc(userRef, {
-            isActive: isActive,
-            lastActive: serverTimestamp(),
-        });
-    } catch (error) {
-        console.error("Error updating user status:", error);
-    }
-}
 
-async function listenForUserStatusUpdates() {
-    const usersRef = collection(firebaseService.db, "users");
-    onSnapshot(usersRef, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            const userId = change.doc.id;
-            const userData = change.doc.data();
-
-            // console.log(`Snapshot change: ${change.type} for ${userId}`, userData);
-
-            if (change.type === "modified" && userData.isActive !== undefined) {
-                updateUserUI(userId, userData.isActive);
-            }
-        });
-    });
-}
-
-function updateUserUI(userId, isActive) {
-    const userElement = document.querySelector(`.individualchat[data-user-id="${userId}"]`);
-    if (!userElement) return;
-    const statusElement = userElement.querySelector(".allactaive span");
-    if (statusElement) {
-        statusElement.className = isActive ? "online" : "offline";
-        console.log(`Updated UI for ${userId} to ${isActive ? "online" : "offline"}`);
-    }
-}
 
 ////////////////////////////////////////////////////
 
