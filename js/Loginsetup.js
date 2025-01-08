@@ -62,7 +62,7 @@ function Validation(){
                 window.location.href = './UtitbestChatInterface.html';
             }catch(error){
                 console.error("Error during login:", error);
-                firebaseService.showToast(`Error loggin users: check your internet connection`, 'error');
+                firebaseService.showToast(`Wrong credential or check your internet connection`, 'error');
             }
             password.value = '';
             Email.value = '';

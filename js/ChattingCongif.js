@@ -114,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 currentUserId = user.uid;
                 const userData = await firebaseService.getUserData(currentUserId);
+
                 settings[0].addEventListener('click', function(){
                     containerRpy.innerHTML =  `
                         <div class="Profile_i">
@@ -184,7 +185,7 @@ async function loadAllUsers() {
                 userElement.innerHTML = `
                     <div style="display: flex; width: 100%; height: 100%; align-items: center;">
                         <div style="display: flex; align-items: center; justify-content: center; width: 20%; height: 100%; position: relative;" class="allactaive">
-                        <span class="" style="position: absolute; top:11px; left:5px; border-radius:50%; width:7px; height:7px;"></span>
+                        <span class="active_detect" style="position: absolute; top:11px; left:5px; border-radius:50%; width:7px; height:7px;"></span>
                             <figure>
                                <img src="" alt="" class="converse">
                                <utit class="spnman11" style="position :absolute; align-items:center; justify-content:center; height:40px; width:40px; border-radius:50%;  background:#3f6bde;">
@@ -207,6 +208,7 @@ async function loadAllUsers() {
                     </div>
                 `;
                  setUserProfilePicture(user.id, userElement)
+                 displayUserStatus(user.id, userElement);
 
                 const repumm = document.querySelector('.currentchatterinfor figure img')
                 userElement.addEventListener('click', async() => {
@@ -736,32 +738,60 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
 
 }
 
-
 // To be continue////////////////////////////////////////////
 
 
+async function updateUserStatus(isOnline) {
+    const user = auth.currentUser;
+    if (!user) return;
+    const userStatusRef = doc(firebaseService.db, `status/${user.uid}`);
+    await setDoc(userStatusRef, {
+        state: isOnline ? 'online' : 'offline',
+        firstName: user.email,
+        last_changed: serverTimestamp()
+    }, { merge: true });
+}
+
+// Call this on successful login
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        updateUserStatus(true); 
+        
+        window.addEventListener('beforeunload', () => {
+            updateUserStatus(false);
+        });
+        
+    }
+});
+window.addEventListener('online', updateUserStatus(true))
+window.addEventListener('offline', updateUserStatus(false))
+           
+
+
+function displayUserStatus(otherUserId, userTagElement) {
+    const otherUserStatusRef = doc(firebaseService.db, `status/${otherUserId}`);
+    const onlineDetectorElement = userTagElement.querySelector('.active_detect')
+    // Listen for real-time changes in user status
+    console.log(onlineDetectorElement)
+    onSnapshot(otherUserStatusRef, (snapshot) => {
+        const status = snapshot.data();
+        if (status?.state === 'online') {
+            onlineDetectorElement.style.backgroundColor = 'green';
+        } else {
+            onlineDetectorElement.style.backgroundColor = 'red';
+        }
+    });
+}
+
+// Example usage: Assuming userTagElement is the HTML element for the user's tag
+// const userTagElement = document.getElementById('userStatus');
+// const otherUserId = "SOME_USER_ID"; // Replace with the user's UID you want to monitor
 
 
 
 
 
 ////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function HideSettings(){
