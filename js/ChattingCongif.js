@@ -752,7 +752,7 @@ async function updateUserStatus(isOnline) {
     }, { merge: true });
 }
 
-// Call this on successful login
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         updateUserStatus(true); 
@@ -766,8 +766,6 @@ onAuthStateChanged(auth, (user) => {
 window.addEventListener('online', updateUserStatus(true))
 window.addEventListener('offline', updateUserStatus(false))
            
-
-
 function displayUserStatus(otherUserId, userTagElement) {
     const otherUserStatusRef = doc(firebaseService.db, `status/${otherUserId}`);
     const onlineDetectorElement = userTagElement.querySelector('.active_detect')
@@ -782,10 +780,6 @@ function displayUserStatus(otherUserId, userTagElement) {
         }
     });
 }
-
-// Example usage: Assuming userTagElement is the HTML element for the user's tag
-// const userTagElement = document.getElementById('userStatus');
-// const otherUserId = "SOME_USER_ID"; // Replace with the user's UID you want to monitor
 
 
 
@@ -810,13 +804,13 @@ async function logoutUser() {
       window.location.href = './indexLogin.html';
     }catch(error) {
       console.error('Error logging out:', error);
-    //   alert('Failed to log out. Please try again.');
     }
 }
   
 function Tologout(){
     let logoutbud = document.querySelector('.namecoms button')
     logoutbud.onclick = () => {
+        updateUserStatus(false)
         logoutUser()
     }
 }
