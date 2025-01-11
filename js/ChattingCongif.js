@@ -27,8 +27,9 @@ const auth = firebaseService.auth;
 const auth1 = getAuth(firebaseApp)
 let currentUserId = null; 
 let otherUserId = null
-
 let chatId = null;
+
+let socket;
 var contentdrop = document.querySelectorAll('.comeins i');
 var settings = document.querySelectorAll('.listOfcontents')
 var droplist = document.querySelector('.dropdown1')
@@ -49,7 +50,9 @@ const fileSelection = document.querySelector('.tochat')
 
 
 
-
+if (Notification.permission !== 'granted') {
+    Notification.requestPermission();
+}
 
 function Settings(){
     settings[1].addEventListener('click', function(){
@@ -208,8 +211,9 @@ async function loadAllUsers() {
                     </div>
                 `;
                  setUserProfilePicture(user.id, userElement)
-                 displayUserStatus(user.id, userElement);
+                initializeWebSocket(user.id);
 
+                //  displayUserStatus(user.id, userElement);
                 const repumm = document.querySelector('.currentchatterinfor figure img')
                 userElement.addEventListener('click', async() => {
                     if(userprofileId.classList.contains('dwells')){
@@ -296,7 +300,7 @@ async function updateprofilepic(){
         if (error.code === 'storage/object-not-found') {
         const defaultPicUrl = await getDownloadURL(defaultRef);
         ssiiee.src = defaultPicUrl;
-        userpicture.defaultPicUrl
+        userpicture.src = defaultPicUrl
         } else {
             ssiiee.src = `./Super icons/defualtman.jfif`
             userpicture.src = `./Super icons/defualtman.jfif`
@@ -417,6 +421,7 @@ async function initializeChat(chatId) {
         firebaseService.listenForMessages(chatId, (messages) => {
             if (chatId !== ActiveChat) return; 
             chatlies1.innerHTML = ""; 
+            firebaseService.listenForNewMessages(chatId)
 
             messages.forEach((message) => {
                 const messageElement = document.createElement("div");
@@ -738,54 +743,105 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
 
 }
 
+///// DESKTOP NOTIFICATION PERMISSION GRANTED
+
+
+
+
+
+
+
+
+
+
 // To be continue////////////////////////////////////////////
 
 
-async function updateUserStatus(isOnline) {
-    const user = auth.currentUser;
-    if (!user) return;
-    const userStatusRef = doc(firebaseService.db, `status/${user.uid}`);
-    await setDoc(userStatusRef, {
-        state: isOnline ? 'online' : 'offline',
-        firstName: user.email,
-        last_changed: serverTimestamp()
-    }, { merge: true });
-}
-
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        updateUserStatus(true); 
+// async function updateUserStatus(isOnline) {
+//     const user = auth.currentUser;
+//     if (!user) return;
+//     const userStatusRef = doc(firebaseService.db, `status/${user.uid}`);
+//     await setDoc(userStatusRef, {
+//         state: isOnline ? 'online' : 'offline',
+//         firstName: user.email,
+//         last_changed: serverTimestamp()
+//     }, { merge: true });
+// }
+// onAuthStateChanged(auth, (user) => {
+//     if (user) {
+//         updateUserStatus(true); 
         
-        window.addEventListener('beforeunload', () => {
-            updateUserStatus(false);
-        });
+//         window.addEventListener('beforeunload', () => {
+//             updateUserStatus(false);
+//         });
         
-    }
-});
-window.addEventListener('online', updateUserStatus(true))
-window.addEventListener('offline', updateUserStatus(false))
-           
-function displayUserStatus(otherUserId, userTagElement) {
-    const otherUserStatusRef = doc(firebaseService.db, `status/${otherUserId}`);
-    const onlineDetectorElement = userTagElement.querySelector('.active_detect')
-    // Listen for real-time changes in user status
-    console.log(onlineDetectorElement)
-    onSnapshot(otherUserStatusRef, (snapshot) => {
-        const status = snapshot.data();
-        if (status?.state === 'online') {
-            onlineDetectorElement.style.backgroundColor = 'green';
-        } else {
-            onlineDetectorElement.style.backgroundColor = 'red';
-        }
-    });
-}
+//     }
+// });
+// window.addEventListener('online', updateUserStatus(true))
+// window.addEventListener('offline', updateUserStatus(false)) 
+// function displayUserStatus(otherUserId, userTagElement) {
+//     const otherUserStatusRef = doc(firebaseService.db, `status/${otherUserId}`);
+//     const onlineDetectorElement = userTagElement.querySelector('.active_detect')
+//     // Listen for real-time changes in user status
+//     console.log(onlineDetectorElement)
+//     onSnapshot(otherUserStatusRef, (snapshot) => {
+//         const status = snapshot.data();
+//         if (status?.state === 'online') {
+//             onlineDetectorElement.style.backgroundColor = 'green';
+//         } else {
+//             onlineDetectorElement.style.backgroundColor = 'red';
+//         }
+//     });
+// }
 
 
 
 
 
 ////////////////////////////////////////////////////
+
+
+
+// Initialize WebSocket and Firestore updates
+function initializeWebSocket(userId) {
+    socket = new WebSocket('ws://localhost:8080');
+    // WebSocket opened (user online)
+    socket.onopen = async () => {
+        console.log('WebSocket connected');
+        await updateFirestoreStatus(userId, true);
+    };
+
+    // WebSocket closed (user offline)
+    socket.onclose = async () => {
+        console.log('WebSocket disconnected');
+        await updateFirestoreStatus(userId, false);
+    };
+
+    // Listen for messages from the server
+    socket.onmessage = (event) => {
+        console.log('Message received from server:', event.data);
+    };
+
+    // Send a test message to the server
+    document.getElementById('sendButton')?.addEventListener('click', () => {
+        socket.send('User sent a test message!');
+    });
+}
+// Function to update Firestore status
+async function updateFirestoreStatus(userId, isOnline) {
+    try {
+        await updateDoc(doc(firebaseService.db, "users", userId), {
+            isActive: isOnline,
+            lastActive: serverTimestamp()
+        });
+        console.log(`User status updated: ${isOnline ? 'Online' : 'Offline'}`);
+    } catch (error) {
+        console.error("Error updating Firestore:", error);
+    }
+}
+
+// Call WebSocket initialization
+
 
 
 function HideSettings(){
@@ -810,7 +866,6 @@ async function logoutUser() {
 function Tologout(){
     let logoutbud = document.querySelector('.namecoms button')
     logoutbud.onclick = () => {
-        updateUserStatus(false)
         logoutUser()
     }
 }

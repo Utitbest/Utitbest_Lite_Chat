@@ -108,8 +108,8 @@ async registerUser(credentials, userData) {
       await setDoc(doc(this.db, "users", userId), {
         uid: userId,
         ...userData,
-        // isActive: true,
-        // lastActive: serverTimestamp(),
+        isActive: true,
+        lastActive: serverTimestamp(),
         createdAt: new Date()
       });
 
@@ -242,7 +242,6 @@ async listenForMessages11() {
     onSnapshot(chatsRef, (snapshot) => {
       snapshot.docs.forEach((doc) => {
         const chatId = doc.id;
-        // console.log(chatId)
         const messagesRef = collection(this.db, "chats", chatId, "messages");
         const q = query(messagesRef, orderBy("timestamp", "asc"));
 
@@ -256,7 +255,6 @@ async listenForMessages11() {
               if (receiverId === currentUser.uid) {
                 this.notifyUser(senderId, data);
                 this.notifyUser12(senderId, data, messageId, chatId);
-                // console.log(messageId)
               }
               if (senderId === currentUser.uid) {
                 this.notifyUser(receiverId, data);
@@ -373,5 +371,39 @@ async markMessageAsSeen(chatId, messageId) {
     this.showToast(`Error marking message as seen: ${error}`);
   }
 }
+
+
+///// DESKTOP NOTIFICATION START HERE
+async listenForNewMessages(chatId) {
+    const lastCheckTime = new Date(); // Track the last time the user loaded the page
+
+    const messagesRef = collection(this.db, "chats", chatId, "messages");
+    const q = query(
+        messagesRef,
+        where("timestamp", ">", lastCheckTime),
+        orderBy("timestamp", "asc")
+    );
+
+    onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                const messageData = change.doc.data();
+                console.log("New message:", messageData);
+                this.showNotification("New Message", messageData.text);
+            }
+        });
+    });
+}
+
+
+showNotification(title, message) {
+    if (Notification.permission === 'granted') {
+        new Notification(title, {
+            body: message,
+            icon: './Super icons/pardd.png'
+        });
+    }
+}
+//////////////////////////////////////////////////////////////////
 
 }
