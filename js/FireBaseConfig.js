@@ -373,7 +373,7 @@ async markMessageAsSeen(chatId, messageId) {
 }
 
 
-///// DESKTOP NOTIFICATION START HERE
+///// DESKTOP NOTIFICATION START
 async listenForNewMessages(chatId) {
     const lastCheckTime = new Date(); // Track the last time the user loaded the page
 
@@ -404,6 +404,5 @@ showNotification(title, message) {
         });
     }
 }
-//////////////////////////////////////////////////////////////////
 
 }
