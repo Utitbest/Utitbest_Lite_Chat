@@ -417,28 +417,29 @@ async listenForAllChats() {
 
 async listenForNewMessages(chatId, currentUserId) {
   const messagesRef = collection(this.db, "chats", chatId, "messages");
-  const userRef = await this.getUserData(currentUserId)
+  
   const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
-  this.UserName = userRef.firstname + ' ' + userRef.lastname
   // Unsubscribe previous listener for this chat if exists
   if (this.unsubscribers[chatId]) {
       this.unsubscribers[chatId]();
   }
 
   // Set a new listener
-  this.unsubscribers[chatId] = onSnapshot(
-      query(messagesRef, orderBy("timestamp", "asc")),
+   this.unsubscribers[chatId] =  onSnapshot(
+    query(messagesRef, orderBy("timestamp", "asc")),
       (snapshot) => {
-          snapshot.docChanges().forEach((change) => {
+          snapshot.docChanges().forEach( async (change) => {
               const messageData = change.doc.data();
               const messageTimestamp = messageData.timestamp?.toDate() || new Date(0);
-
+              const userRef = await this.getUserData(messageData.senderId)
               if (
                   change.type === "added" &&
                   messageData.senderId !== currentUserId &&
                   messageData.recipientId === currentUserId &&
                   messageTimestamp > this.lastCheckTime[chatId]
               ) {
+                  console.log(messageData.senderId)
+                  this.UserName = userRef.firstname + ' ' + userRef.lastname
                   this.lastCheckTime[chatId] = new Date();
                   this.showNotification(this.UserName, messageData.content);
                   notify.play()
