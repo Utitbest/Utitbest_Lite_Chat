@@ -12,6 +12,10 @@ export default class FirebaseService {
     this.db = getFirestore(); 
     this.auth = getAuth();
     this.storage = getStorage();
+    this.unsubscribers = {};
+    this.lastCheckTime = {};
+    this.UserName = null;
+
   }
 
   showToast(message, type = "success") {
@@ -332,67 +336,116 @@ getRelativeTime1(timestamp) {
 
 }
 
-notifyUser12(senderId, message, messageId, chatId){
-      const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
+/////////////////////////////////////////////////////////////////////////
+// async listenForAllChats() {
+//   const auth = getAuth();
+//   const currentUserId = auth.currentUser?.uid;
+//   const chatsRef = collection(this.db, "chats");
 
-      const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
-      const sww = userTag.querySelector('.times span .whatsappna')
-      if(sww){
-        if(!message.Status){
-          sww.style.backgroundColor = '#0a70ea';
-          notify.play()
-        }else{
-          sww.style.backgroundColor = '';
-        }
-      
-      }
-      userTag.addEventListener('click', () =>{
-        sww.style.backgroundColor = '';
-        this.markMessageAsSeen(chatId, messageId);
-      })
-    
-}
+//   const q = query(chatsRef, where("participants", "array-contains", currentUserId));
 
-async markMessageAsSeen(chatId, messageId) {
-  try {
-    
-    const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
+//   onSnapshot(q, (snapshot) => {
+//       snapshot.docs.forEach((chatDoc) => {
+//           const chatId = chatDoc.id;
+//           // console.log(chatId)
+//           this.listenForNewMessages(chatId); // Call the message listener for each chat
+//       });
+//   });
+// }
 
-    const messageSnapshot = await getDoc(messageRef);
-    if (!messageSnapshot.exists()) {
-      console.error("No document found for messageId:", messageId);
-      return; // Exit if the document does not exist
-    }
+// async listenForNewMessages(chatId) {
+//   const auth = getAuth();
+//   const currentUserId = auth.currentUser?.uid;
+//   const messagesRef = collection(this.db, "chats", chatId, "messages");
+//   console.log(currentUserId)
+//   // Ensure only new messages are tracked
+//   let lastCheckTime = new Date(); 
 
-    await updateDoc(messageRef, {Status: true});
+//   onSnapshot(
+//       query(messagesRef, orderBy("timestamp", "asc")),
+//       (snapshot) => {
+//           snapshot.docChanges().forEach((change) => {
+//               const messageData = change.doc.data();
+//               const messageTimestamp = messageData.timestamp?.toDate() || new Date(0);
 
-  } catch (error) {
-    console.error("Error marking message as seen:", error);
-    this.showToast(`Error marking message as seen: ${error}`);
+//               // Notify only if it's a new message meant for the current user
+//               if (
+//                   change.type === "added" &&
+//                   messageData.senderId !== currentUserId &&
+//                   messageData.recipientId === currentUserId &&
+//                   messageTimestamp > lastCheckTime
+//               ) {
+//                   console.log(`New message from chat ${chatId}:`, messageData.text);
+//                   // this.showNotification("New Message", messageData.text);
+//                   lastCheckTime = new Date();
+//               }
+//           });
+//       }
+//   );
+// }
+////////////////////////////////////////////////////////////////////////////
+
+async listenForAllChats() {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  if (!currentUser) {
+      console.error("User not logged in.");
+      return;
   }
+
+  const currentUserId = currentUser.uid;
+  const chatsRef = collection(this.db, "chats");
+
+
+  // Unsubscribe previous listener if exists
+  if (this.unsubscribers.allChats) {
+      this.unsubscribers.allChats();
+  }
+
+  // Set a single listener for all chats
+  const q = query(chatsRef, where("participants", "array-contains", currentUserId));
+  this.unsubscribers.allChats = onSnapshot(q, (snapshot) => {
+      snapshot.docs.forEach((chatDoc) => {
+          const chatId = chatDoc.id;
+          if (!this.lastCheckTime[chatId]) {
+              this.lastCheckTime[chatId] = new Date();
+          }
+          this.listenForNewMessages(chatId, currentUserId);
+      });
+  });
 }
 
+async listenForNewMessages(chatId, currentUserId) {
+  const messagesRef = collection(this.db, "chats", chatId, "messages");
+  const userRef = await this.getUserData(currentUserId)
+  const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
+  this.UserName = userRef.firstname + ' ' + userRef.lastname
+  // Unsubscribe previous listener for this chat if exists
+  if (this.unsubscribers[chatId]) {
+      this.unsubscribers[chatId]();
+  }
 
-///// DESKTOP NOTIFICATION START
-async listenForNewMessages(chatId) {
-    const lastCheckTime = new Date(); // Track the last time the user loaded the page
+  // Set a new listener
+  this.unsubscribers[chatId] = onSnapshot(
+      query(messagesRef, orderBy("timestamp", "asc")),
+      (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+              const messageData = change.doc.data();
+              const messageTimestamp = messageData.timestamp?.toDate() || new Date(0);
 
-    const messagesRef = collection(this.db, "chats", chatId, "messages");
-    const q = query(
-        messagesRef,
-        where("timestamp", ">", lastCheckTime),
-        orderBy("timestamp", "asc")
-    );
-
-    onSnapshot(q, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-                const messageData = change.doc.data();
-                console.log("New message:", messageData);
-                this.showNotification("New Message", messageData.text);
-            }
-        });
-    });
+              if (
+                  change.type === "added" &&
+                  messageData.senderId !== currentUserId &&
+                  messageData.recipientId === currentUserId &&
+                  messageTimestamp > this.lastCheckTime[chatId]
+              ) {
+                  this.lastCheckTime[chatId] = new Date();
+                  this.showNotification(this.UserName, messageData.content);
+                  notify.play()
+              }
+          });
+      }
+  );
 }
 
 
@@ -404,5 +457,41 @@ showNotification(title, message) {
         });
     }
 }
+
+notifyUser12(senderId, message, messageId, chatId){
+  const userTag = document.querySelector(`.individualchat[data-user-id="${senderId}"]`)
+  const sww = userTag.querySelector('.times span .whatsappna')
+  if(sww){
+    if(!message.Status){
+      sww.style.backgroundColor = '#0a70ea';
+    }else{
+      sww.style.backgroundColor = '';
+    }
+  }
+  userTag.addEventListener('click', () =>{
+    sww.style.backgroundColor = '';
+    this.markMessageAsSeen(chatId, messageId);
+  })
+}
+
+async markMessageAsSeen(chatId, messageId) {
+try {
+
+const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
+
+const messageSnapshot = await getDoc(messageRef);
+if (!messageSnapshot.exists()) {
+  console.error("No document found for messageId:", messageId);
+  return; // Exit if the document does not exist
+}
+
+await updateDoc(messageRef, {Status: true});
+
+} catch (error) {
+console.error("Error marking message as seen:", error);
+this.showToast(`Error marking message as seen: ${error}`);
+}
+}
+
 
 }

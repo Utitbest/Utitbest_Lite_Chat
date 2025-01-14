@@ -105,6 +105,8 @@ Settings()
 onAuthStateChanged(auth, (user) => {
     if (user) {
       firebaseService.listenForMessages11();
+      firebaseService.listenForAllChats()
+
     } else {
       console.error("No user is logged in. Redirecting to login...");
       window.location.href = './indexLogin.html';
@@ -250,6 +252,8 @@ async function loadAllUsers() {
         firebaseService.showToast(`Error loading users: ${error.message}`, 'error');
     }
 } 
+
+
 
 async function setUserProfilePicture(userId, userElement) {
     const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
@@ -418,10 +422,10 @@ async function initializeChat(chatId) {
         ActiveChat = chatId;
         chatlies1.innerHTML = "";
 
+
         firebaseService.listenForMessages(chatId, (messages) => {
             if (chatId !== ActiveChat) return; 
             chatlies1.innerHTML = ""; 
-            firebaseService.listenForNewMessages(chatId)
 
             messages.forEach((message) => {
                 const messageElement = document.createElement("div");
@@ -742,7 +746,6 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
     })
 
 }
-
 ///// DESKTOP NOTIFICATION PERMISSION GRANTED
 
 
@@ -813,7 +816,7 @@ function initializeWebSocket(userId) {
 
     // WebSocket closed (user offline)
     socket.onclose = async () => {
-        console.log('WebSocket disconnected');
+        // console.log('WebSocket disconnected');
         await updateFirestoreStatus(userId, false);
     };
 
@@ -834,7 +837,7 @@ async function updateFirestoreStatus(userId, isOnline) {
             isActive: isOnline,
             lastActive: serverTimestamp()
         });
-        console.log(`User status updated: ${isOnline ? 'Online' : 'Offline'}`);
+        // console.log(`User status updated: ${isOnline ? 'Online' : 'Offline'}`);
     } catch (error) {
         console.error("Error updating Firestore:", error);
     }
