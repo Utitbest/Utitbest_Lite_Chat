@@ -42,7 +42,7 @@ async getCurrentUserId() {
   }
 }
 
-  async createDocument(collectionName, data) {
+async createDocument(collectionName, data) {
     try {
       const docRef = await addDoc(collection(this.db, collectionName), data);
       this.showToast("Document created successfully!");
@@ -51,13 +51,13 @@ async getCurrentUserId() {
       this.showToast(`Error creating document: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
-  async readDocument(collectionName, documentId) {
+async readDocument(collectionName, documentId) {
     try {
       const docRef = doc(this.db, collectionName, documentId);
       const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
+      if (docSnap.exists()){
         this.showToast("Document retrieved successfully!");
         return { id: docSnap.id, ...docSnap.data() };
       } else {
@@ -68,9 +68,9 @@ async getCurrentUserId() {
       this.showToast(`Error reading document: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
-  async readAllDocuments(collectionName) {
+async readAllDocuments(collectionName) {
     try {
       const snapshot = await getDocs(collection(this.db, collectionName));
       this.showToast("All documents retrieved successfully!");
@@ -79,9 +79,9 @@ async getCurrentUserId() {
       this.showToast(`Error reading documents: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
-  async updateDocument(collectionName, documentId, data) {
+async updateDocument(collectionName, documentId, data) {
     try {
       const docRef = doc(this.db, collectionName, documentId);
       await updateDoc(docRef, data);
@@ -90,7 +90,7 @@ async getCurrentUserId() {
       this.showToast(`Error updating document: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
 async deleteDocument(collectionName, documentId) {
     try {
@@ -101,7 +101,7 @@ async deleteDocument(collectionName, documentId) {
       this.showToast(`Error deleting document: ${error.message}`, "error");
       throw error;
     }
-  }
+}
 
 async registerUser(credentials, userData) {
     try {
@@ -153,6 +153,41 @@ async getAllUsers() {
         console.error("Error retrieving users:", error);
         throw error;
     }
+}
+
+// async getUserByEmail(email) {
+//   const usersCollection = collection(this.db, 'users');
+//   const q = query(usersCollection, where('email', '==', email));
+//   const querySnapshot = await getDocs(q);
+//   try {
+//       if (!querySnapshot.empty) {
+//         const userData = querySnapshot.docs[0].data();
+//         return userData; // Return the user data if found
+//       }else {
+//         throw new Error('No user found with this email');
+//       }
+//   }catch (error) {
+//     this.showToast(`No user found with this: ${error}`);
+//   }
+  
+// }
+
+async getUserByEmail(email) {
+  try {
+      const usersRef = collection(this.db, "users");
+      const q = query(usersRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+          const userData = querySnapshot.docs[0].data();
+          console.log(userData)
+          return userData;
+      } else {
+          throw new Error("No user found with this email.");
+      }
+  } catch (error) {
+      throw new Error(`Error fetching user: ${error.message}`);
+  }
 }
 
 async sendMessage(chatId, senderId, recipientId, messageContent) {
@@ -328,62 +363,13 @@ getRelativeTime1(timestamp) {
   if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
   if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
   if (days > 0) {
-      return days === 1 ? 'Yesterday' : `${days}days ago`;
+    return days === 1 ? 'Yesterday' : `${days}Days ago`;
   }
   if (hours > 0) return `${hours}hr${hours > 1 ? 's' : ''}`;
   if (minutes > 0) return `${minutes}min${minutes > 1 ? 's' : ''}`;
   return `just now`;
 
 }
-
-/////////////////////////////////////////////////////////////////////////
-// async listenForAllChats() {
-//   const auth = getAuth();
-//   const currentUserId = auth.currentUser?.uid;
-//   const chatsRef = collection(this.db, "chats");
-
-//   const q = query(chatsRef, where("participants", "array-contains", currentUserId));
-
-//   onSnapshot(q, (snapshot) => {
-//       snapshot.docs.forEach((chatDoc) => {
-//           const chatId = chatDoc.id;
-//           // console.log(chatId)
-//           this.listenForNewMessages(chatId); // Call the message listener for each chat
-//       });
-//   });
-// }
-
-// async listenForNewMessages(chatId) {
-//   const auth = getAuth();
-//   const currentUserId = auth.currentUser?.uid;
-//   const messagesRef = collection(this.db, "chats", chatId, "messages");
-//   console.log(currentUserId)
-//   // Ensure only new messages are tracked
-//   let lastCheckTime = new Date(); 
-
-//   onSnapshot(
-//       query(messagesRef, orderBy("timestamp", "asc")),
-//       (snapshot) => {
-//           snapshot.docChanges().forEach((change) => {
-//               const messageData = change.doc.data();
-//               const messageTimestamp = messageData.timestamp?.toDate() || new Date(0);
-
-//               // Notify only if it's a new message meant for the current user
-//               if (
-//                   change.type === "added" &&
-//                   messageData.senderId !== currentUserId &&
-//                   messageData.recipientId === currentUserId &&
-//                   messageTimestamp > lastCheckTime
-//               ) {
-//                   console.log(`New message from chat ${chatId}:`, messageData.text);
-//                   // this.showNotification("New Message", messageData.text);
-//                   lastCheckTime = new Date();
-//               }
-//           });
-//       }
-//   );
-// }
-////////////////////////////////////////////////////////////////////////////
 
 async listenForAllChats() {
   const auth = getAuth();
@@ -420,11 +406,10 @@ async listenForNewMessages(chatId, currentUserId) {
   
   const notify = new Audio('./mixkit-correct-answer-tone-2870.wav')
   // Unsubscribe previous listener for this chat if exists
-  if (this.unsubscribers[chatId]) {
+  if(this.unsubscribers[chatId]) {
       this.unsubscribers[chatId]();
   }
 
-  // Set a new listener
    this.unsubscribers[chatId] =  onSnapshot(
     query(messagesRef, orderBy("timestamp", "asc")),
       (snapshot) => {
@@ -432,12 +417,12 @@ async listenForNewMessages(chatId, currentUserId) {
               const messageData = change.doc.data();
               const messageTimestamp = messageData.timestamp?.toDate() || new Date(0);
               const userRef = await this.getUserData(messageData.senderId)
-              if (
+              if(
                   change.type === "added" &&
                   messageData.senderId !== currentUserId &&
                   messageData.recipientId === currentUserId &&
                   messageTimestamp > this.lastCheckTime[chatId]
-              ) {
+               ){
                   console.log(messageData.senderId)
                   this.UserName = userRef.firstname + ' ' + userRef.lastname
                   this.lastCheckTime[chatId] = new Date();

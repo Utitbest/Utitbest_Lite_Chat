@@ -1,4 +1,11 @@
 import FirebaseService from './FireBaseConfig.js';
+// import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+// import { getFirestore, doc, getDocs, collection } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+// // const Retriving = doc(firebaseService.db, 'user')
+// const usersSnapshot = await getDocs(collection(firebaseService.db, "users"));
+// const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+// console.log(users)
+//COMING FOR IT LATER
 
 const firebaseConfig = {
     apiKey: "AIzaSyB6tpiYpOYmh9z2LCzWClPhC4IJCWgBaMc",
@@ -10,7 +17,7 @@ const firebaseConfig = {
 };
 const firebaseService = new FirebaseService(firebaseConfig);
 
-function Validation(){
+async function Validation(){
         var ErroMsg = document.querySelector('.errorIN')
         var diss = document.querySelectorAll('.bbb')
         var Email = document.querySelector('.Email')

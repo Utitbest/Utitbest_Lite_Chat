@@ -106,12 +106,13 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
       firebaseService.listenForMessages11();
       firebaseService.listenForAllChats()
-
     } else {
       console.error("No user is logged in. Redirecting to login...");
       window.location.href = './indexLogin.html';
     }
 });
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, async (user) => {
@@ -239,7 +240,7 @@ async function loadAllUsers() {
                         }
                     }
                     chatId = [currentUserId, otherUserId].sort().join('_'); 
-                    Chatterinfordisply.innerHTML = user.firstname + user.lastname;
+                    Chatterinfordisply.innerHTML = user.firstname+ ' ' + user.lastname;
                     initializeChat(chatId); 
                     sendingFilesAsSMS(chatId, currentUserId, otherUserId)
                     
@@ -252,8 +253,6 @@ async function loadAllUsers() {
         firebaseService.showToast(`Error loading users: ${error.message}`, 'error');
     }
 } 
-
-
 
 async function setUserProfilePicture(userId, userElement) {
     const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
@@ -514,7 +513,6 @@ sendbutton.addEventListener("click", async function (){
                     otherUserId,            
                     messageContent 
                 );
-                
                 chatInputText.value = ""; 
             } catch (error) {
                 console.error("Error sending message:", error);
@@ -746,18 +744,6 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
     })
 
 }
-///// DESKTOP NOTIFICATION PERMISSION GRANTED
-
-
-
-
-
-
-
-
-
-
-// To be continue////////////////////////////////////////////
 
 
 // async function updateUserStatus(isOnline) {
