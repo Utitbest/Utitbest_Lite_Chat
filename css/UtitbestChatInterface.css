@@ -203,6 +203,7 @@ div :is(div .username_chat){
     color: rgb(95, 93, 93);
     overflow:hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .username_chat p{
     font-size: .8em;
@@ -210,6 +211,7 @@ div :is(div .username_chat){
     color: gray;
     overflow: hidden;
     white-space: nowrap;
+    text-overflow:ellipsis;
 }
 
 div :is(div .times){
@@ -219,16 +221,22 @@ div :is(div .times){
     height: 100%;
     align-items: center;
 }
-.times p{
+.mansnd{
     width: 100%;
     height: 50%;
     display: flex;
+    align-items: center;
+}
+.times p{
+    
+    
     font-size: 10px;
     font-weight: 500;
     color: rgb(95, 93, 93);
-    justify-content: center;
+    
     overflow: hidden;
     white-space: nowrap;
+    text-overflow:ellipsis ;
     align-items: center;
 }
 .times span{
@@ -311,11 +319,17 @@ div :is(div .times){
 .chattername h3 {
     font-size: .9em;
     color: rgb(95, 93, 93);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .chattername p {
     font-size: .8em;
     font-weight: 500;
     color: gray;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .followby :is(div.frocalliconsmore) {
@@ -352,7 +366,8 @@ div :is(div .times){
     height: 100%;
     width: 100%;
     display: flex;
-    flex-direction: column;
+    justify-items: end;
+    flex-direction: column-reverse;
     overflow-y: auto;
 }
 .chatlies1 .replyer{
@@ -360,7 +375,9 @@ div :is(div .times){
     max-width: 100%;
     display: flex;
     height: auto;
+    
 }
+
 
 .chatlies1 .user_response{
     height: auto;
@@ -394,6 +411,7 @@ div :is(div .times){
 .flowsa0 p{
     height: 90%;
     width: 100%;
+    word-wrap: break-word;
 }
 .flowsa0  h6{
     display: flex;
@@ -423,6 +441,7 @@ div :is(div .times){
 .flowsa1 p{
     height: 90%;
     width: 100%;
+    word-wrap: break-word;
 }
 .flowsa1  h6{
     display: flex;
@@ -723,6 +742,7 @@ div :is(div .times){
     padding: .5em;
     border-radius: 5px;
     background-color: #ffffff;
+    z-index: 100;
 }
 .Profile_i h2{
     width: 100%;
@@ -737,6 +757,9 @@ div :is(div .times){
     font-weight: 600;
     width: 90%;
     color: rgb(75, 74, 74);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .Profile_i :is(div .phoneNo){
     width: 100%;
@@ -984,6 +1007,9 @@ div :is(div .times){
     height: 50px;
     width: 0;
     display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     border-radius: 10px;
     transition: 1s linear;
     background-color: #3f6bde;

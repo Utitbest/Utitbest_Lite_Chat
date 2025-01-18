@@ -155,41 +155,6 @@ async getAllUsers() {
     }
 }
 
-// async getUserByEmail(email) {
-//   const usersCollection = collection(this.db, 'users');
-//   const q = query(usersCollection, where('email', '==', email));
-//   const querySnapshot = await getDocs(q);
-//   try {
-//       if (!querySnapshot.empty) {
-//         const userData = querySnapshot.docs[0].data();
-//         return userData; // Return the user data if found
-//       }else {
-//         throw new Error('No user found with this email');
-//       }
-//   }catch (error) {
-//     this.showToast(`No user found with this: ${error}`);
-//   }
-  
-// }
-
-async getUserByEmail(email) {
-  try {
-      const usersRef = collection(this.db, "users");
-      const q = query(usersRef, where("email", "==", email));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-          const userData = querySnapshot.docs[0].data();
-          console.log(userData)
-          return userData;
-      } else {
-          throw new Error("No user found with this email.");
-      }
-  } catch (error) {
-      throw new Error(`Error fetching user: ${error.message}`);
-  }
-}
-
 async sendMessage(chatId, senderId, recipientId, messageContent) {
   try {
       const chatRef = doc(this.db, "chats", chatId);
@@ -331,9 +296,7 @@ notifyUser(userId, message) {
       abi = Math.floor(Date.now() / 1000);
     }
     userTag.querySelector('.times p').textContent = this.getRelativeTime1(abi);
-    if(userTag.querySelector('.times p').textContent.length > 7){
-      userTag.querySelector('.times p').textContent = userTag.querySelector('.times p').textContent.slice(0, 7) + '...';
-    }
+    
     const userlist = document.querySelector('.secondusers')
     
     if(userlist && userlist.firstElementChild !== userTag) {
@@ -363,7 +326,7 @@ getRelativeTime1(timestamp) {
   if (years > 0) return `${years} year${years > 1 ? 's' : ''}`;
   if (months > 0) return `${months} month${months > 1 ? 's' : ''}`;
   if (days > 0) {
-    return days === 1 ? 'Yesterday' : `${days}Days ago`;
+    return days === 1 ? 'Yesterday' : `${days}days ago`;
   }
   if (hours > 0) return `${hours}hr${hours > 1 ? 's' : ''}`;
   if (minutes > 0) return `${minutes}min${minutes > 1 ? 's' : ''}`;
@@ -468,7 +431,7 @@ const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
 const messageSnapshot = await getDoc(messageRef);
 if (!messageSnapshot.exists()) {
   console.error("No document found for messageId:", messageId);
-  return; // Exit if the document does not exist
+  return; 
 }
 
 await updateDoc(messageRef, {Status: true});
@@ -479,5 +442,36 @@ this.showToast(`Error marking message as seen: ${error}`);
 }
 }
 
+async UpdateFirstName(userId, newFirstName){ 
+  try {
+
+      const userDocRef = doc(this.db, "users", userId);
+
+      await updateDoc(userDocRef, {
+        firstname: newFirstName,
+      });
+
+      this.showToast("User Firstname updated successfully!", "success");
+  } catch (error) {
+      console.error("Error updating user Firstname:", error.message);
+      this.showToast(`Error: ${error.message}`, "error");
+  }
+}
+
+async UpdateLastName(userId, newLastName){ 
+  try {
+
+      const userDocRef = doc(this.db, "users", userId);
+
+      await updateDoc(userDocRef, {
+        lastname: newLastName,
+      });
+
+      this.showToast("User Lastname updated successfully!", "success");
+  } catch (error) {
+      console.error("Error updating user Lastname:", error.message);
+      this.showToast(`Error: ${error.message}`, "error");
+  }
+}
 
 }

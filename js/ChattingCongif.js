@@ -28,6 +28,8 @@ const auth1 = getAuth(firebaseApp)
 let currentUserId = null; 
 let otherUserId = null
 let chatId = null;
+let FirstNameBoolen = false;
+let LastNameBoolen = false;
 
 let socket;
 var contentdrop = document.querySelectorAll('.comeins i');
@@ -41,7 +43,6 @@ var sendbutton = document.querySelector('.inputing div button')
 var chatInputText = document.querySelector('#messageinput')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
-let fon = document.querySelector('.res')
 const appender = document.querySelector('.theInputsEtc .inputing')
 let ActiveChat = null;
 const userprofileId = document.querySelector('.signs');
@@ -106,13 +107,12 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
       firebaseService.listenForMessages11();
       firebaseService.listenForAllChats()
+      console.log(user.uid)
     } else {
       console.error("No user is logged in. Redirecting to login...");
       window.location.href = './indexLogin.html';
     }
 });
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
     onAuthStateChanged(auth, async (user) => {
@@ -140,13 +140,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="informs" title="Firstname">
                                     <p>${userData.firstname}</p>
                                     <span class="EditName">
-                                        <i class="fa fa-edit"></i>
+                                        <i class="fa fa-edit" style="z-index:-100;"></i>
                                     </span>
                                 </div>
                                 <div style="margin-top:.6em;" class="informs" title="Lastname">
                                     <p>${userData.lastname}</p>
                                     <span class="EditName">
-                                        <i class="fa fa-edit"></i>
+                                        <i class="fa fa-edit" style="z-index:-100;"></i>
                                     </span>
                                 </div>
                                 <div style="margin-top:.6em;" class="informs" title="Email">
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
                            </div>
                         </div>
                     `;
-
+                    UpdatingName(currentUserId)
                     Tologout()
                     updateprofilepic()
                 })
@@ -172,6 +172,91 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+async function UpdatingName(userId) {
+    let EditNameButton = document.querySelectorAll('.informs span')
+    let NameTag = document.querySelectorAll('.informs p')
+    function UpdatingFirstName(){
+        EditNameButton[0].addEventListener('click', async (event)=>{
+            event.stopPropagation()
+            FirstNameBoolen ? update() : Clicking()
+            
+        })
+
+        function Clicking(){
+            EditNameButton[0].innerHTML = '<i class="fa fa-check" style="z-index:-100;"></i>'
+            FirstNameBoolen = true;
+            NameTag[0].setAttribute('contenteditable', true)
+            NameTag[0].style.borderColor = 'gray'
+            NameTag[0].style.outline = 'none';
+            NameTag[0].focus();
+            NameTag[0].style.textOverflow = 'clip';
+        }
+        async function update(){
+
+            if(NameTag[0].innerHTML == ''){
+                firebaseService.showToast("Invalid input. Please provide valid details.", "error");
+                return;
+            }
+
+            if(NameTag[0].innerHTML.search(/[^a-z]/i) !== -1){
+                firebaseService.showToast(`Fill the input & No special character allowed`, 'error')
+                return;
+            }
+            await firebaseService.UpdateFirstName(userId, NameTag[0].innerHTML)
+            FirstNameBoolen = false;
+            NameTag[0].style.textOverflow = 'ellipsis';
+            EditNameButton[0].innerHTML = '<i class="fa fa-edit" style="z-index:-100;"></i>';
+            NameTag[0].setAttribute('contenteditable', false)
+            // setInterval(() => {
+            //     location.reload()
+            // }, 3000);
+            // firebaseService.showToast("First name updated successfully");
+
+        }
+    }
+
+
+    function UpdatingLastName(){
+        EditNameButton[1].addEventListener('click', async (event)=>{
+            event.stopPropagation()
+            LastNameBoolen ? update1() : Clicking1()
+        })
+
+        function Clicking1(){
+            EditNameButton[1].innerHTML = '<i class="fa fa-check" style="z-index:-100;"></i>'
+            LastNameBoolen = true;
+            NameTag[1].setAttribute('contenteditable', true)
+            NameTag[1].style.borderColor = 'gray'
+            NameTag[1].style.outline = 'none';
+            NameTag[1].focus();
+            NameTag[1].style.textOverflow = 'clip';
+        }
+
+        async function update1(){
+            if(NameTag[1].innerHTML == ''){
+                firebaseService.showToast("Invalid input. Please provide valid details.", "error");
+                return;
+            }
+
+            if(NameTag[1].innerHTML.search(/[^a-z]/i) !== -1){
+                firebaseService.showToast(`Fill the input & No special character allowed`, 'error')
+                return;
+            }
+            await firebaseService.UpdateLastName(userId, NameTag[1].innerHTML)
+            LastNameBoolen = false
+            NameTag[1].style.textOverflow = 'ellipsis';
+            EditNameButton[1].innerHTML = '<i class="fa fa-edit" style="z-index:-100;"></i>';
+            NameTag[1].setAttribute('contenteditable', false)
+            // setInterval(() => {
+            //     location.reload()
+            // }, 3000);
+            // firebaseService.showToast("First name updated successfully");
+        }
+    }
+    UpdatingFirstName()
+    UpdatingLastName()
+}
 
 async function loadAllUsers() {
     try{
@@ -205,7 +290,9 @@ async function loadAllUsers() {
                                 <p></p>
                             </div>
                             <div class="times">
-                                <p></p>
+                                <saviour class="mansnd">
+                                    <p></p>
+                                </saviour>
                                 <span>
                                     <span class="whatsappna"></span>
                                 </span>
@@ -216,7 +303,7 @@ async function loadAllUsers() {
                  setUserProfilePicture(user.id, userElement)
                 initializeWebSocket(user.id);
 
-                //  displayUserStatus(user.id, userElement);
+
                 const repumm = document.querySelector('.currentchatterinfor figure img')
                 userElement.addEventListener('click', async() => {
                     if(userprofileId.classList.contains('dwells')){
@@ -348,20 +435,20 @@ async function updateprofilepic(){
                     firebaseService.showToast('No file selected for upload.', 'error');
                     return;
                 }
-
+                    spinners.style.display = 'flex';
                 try {
-    
                       try {
                         const metadata = await getMetadata(storageRef);
-                        console.log('Image exists:', metadata);
-    
                         await deleteObject(storageRef);
-                        console.log('Previous profile picture deleted successfully');
                         firebaseService.showToast('Previous profile picture deleted successfully.', 'success');
+
                     } catch (error) {
                         if (error.code === 'storage/object-not-found') {
                             console.log('No previous image found. Proceeding with upload.');
                         } else {
+                            ssiiee.src = `./Super icons/defualtman.jfif`;
+                            userpicture.src = `./Super icons/defualtman.jfif`;
+                            spinners.style.display = 'none';
                             throw error; 
                         }
                     }
@@ -377,10 +464,13 @@ async function updateprofilepic(){
                     URL.revokeObjectURL(ssiiee.src, userpicture.src)
                     selectedPic = null; 
                 } catch (error) {
+                    spinners.style.display = 'none';
                     console.error('Error:', error.message);
                     firebaseService.showToast(error.message, 'error');
                     ssiiee.src = defaultRef; 
                     userpicture.src = defaultRef;
+                }finally{
+                    spinners.style.display = 'none';
                 }
             })
         }
@@ -472,7 +562,7 @@ async function initializeChat(chatId) {
                 }
                 messageElement1.append(messageElement2);
                 messageElement.append(messageElement1);
-                chatlies1.appendChild(messageElement);
+                chatlies1.prepend(messageElement);
             });
 
             // Scroll to the latest message
@@ -558,7 +648,12 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
     let tweek = document.createElement('div')
         tweek.className = 'tweek';
     let animationprogress = document.createElement('div')
-        animationprogress.className = 'animationprogress'
+        animationprogress.className = 'animationprogress';
+    let pls = document.createElement('p')
+        pls.style.fontSize = '.7em'
+        pls.style.fontWeight = '500'
+        pls.innerHTML = 'Uploading Please wait...';
+    
     let newsendbuds = document.createElement('button')
         newsendbuds.className = 'newsendbuds';
         newsendbuds.innerHTML = 'Send';
@@ -670,8 +765,9 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 animationprogress.style.width = progress + '%';
                 const Roundup = Math.floor(progress)
-                animationprogress.innerHTML = 'Uploading file please wait..'+ ' ' + Roundup + '%';
+                animationprogress.innerHTML = Roundup + '%' + ' ' + 'Complete!';
                 tweek.append(animationprogress);
+                tweek.append(pls);
             }, async (error) => {
                 firebaseService.showToast(`Upload failed: ${error.message}`, 'error');
                 
@@ -744,7 +840,6 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
     })
 
 }
-
 
 // async function updateUserStatus(isOnline) {
 //     const user = auth.currentUser;
@@ -833,6 +928,7 @@ async function updateFirestoreStatus(userId, isOnline) {
 
 
 
+
 function HideSettings(){
     iconsdem[2].addEventListener('click', function(){
         if(settingsPopup.classList.contains('steeze')){
@@ -879,7 +975,7 @@ window.onclick = function(event){
 }
 
 document.addEventListener('click', function(event){
-    if( iconsdem[2].contains(event.target)){
+    if(iconsdem[2].contains(event.target)){
         settingsPopup.classList.add('steeze1')
         settingsPopup.classList.remove('steeze')
     }else if(!settingsPopup.contains(event.target)){
