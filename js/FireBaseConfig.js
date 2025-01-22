@@ -296,13 +296,7 @@ notifyUser(userId, message) {
       abi = Math.floor(Date.now() / 1000);
     }
     userTag.querySelector('.times p').textContent = this.getRelativeTime1(abi);
-    
-    const userlist = document.querySelector('.secondusers')
-    
-    if(userlist && userlist.firstElementChild !== userTag) {
-      userlist.removeChild(userTag);
-      userlist.prepend(userTag);
-    }
+        
   } else {
     console.warn(`User tag for sender ${userId} not found.`);
   }
@@ -386,10 +380,27 @@ async listenForNewMessages(chatId, currentUserId) {
                   messageData.recipientId === currentUserId &&
                   messageTimestamp > this.lastCheckTime[chatId]
                ){
-                  console.log(messageData.senderId)
                   this.UserName = userRef.firstname + ' ' + userRef.lastname
                   this.lastCheckTime[chatId] = new Date();
-                  this.showNotification(this.UserName, messageData.content);
+
+                  // const userElement = document.querySelector(`[data-user-id="${messageData.senderId}"]`);
+                  // if (userElement){
+                  //   const parentContainer = userElement.parentNode;
+                  //   parentContainer.removeChild(userElement);
+                  //   parentContainer.prepend(userElement); // Move to the top
+                  // }
+                  
+                  this.moveUserTagToTop(messageData.senderId)
+                  
+
+                  let notificationContent = 'Unknown message type';
+                  if (typeof messageData.content === 'string') {
+                    this.showNotification(this.UserName, messageData.content);
+                  }else if(messageData.content.type){
+                    this.showNotification(this.UserName, messageData.content.type.toUpperCase());
+                  }else{
+                    this.showNotification(this.UserName, notificationContent);
+                  }
                   notify.play()
               }
           });
@@ -397,6 +408,14 @@ async listenForNewMessages(chatId, currentUserId) {
   );
 }
 
+async moveUserTagToTop(userId) {
+  const secondusers = document.querySelector('.secondusers')
+  const userTag = document.querySelector(`[data-user-id="${userId}"]`);
+  if (userTag){
+      userTag.remove();
+      secondusers.append(userTag)
+  }
+}
 
 showNotification(title, message) {
     if (Notification.permission === 'granted') {
@@ -423,23 +442,24 @@ notifyUser12(senderId, message, messageId, chatId){
   })
 }
 
+
 async markMessageAsSeen(chatId, messageId) {
-try {
+ try {
 
-const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
+  const messageRef = doc(this.db, "chats", chatId, "messages", messageId);
 
-const messageSnapshot = await getDoc(messageRef);
-if (!messageSnapshot.exists()) {
-  console.error("No document found for messageId:", messageId);
-  return; 
-}
+  const messageSnapshot = await getDoc(messageRef);
+ if(!messageSnapshot.exists()){
+   console.error("No document found for messageId:", messageId);
+   return; 
+  }
 
-await updateDoc(messageRef, {Status: true});
+ await updateDoc(messageRef, {Status: true});
 
-} catch (error) {
-console.error("Error marking message as seen:", error);
-this.showToast(`Error marking message as seen: ${error}`);
-}
+ }catch(error){
+ console.error("Error marking message as seen:", error);
+ this.showToast(`Error marking message as seen: ${error}`);
+ }
 }
 
 async UpdateFirstName(userId, newFirstName){ 

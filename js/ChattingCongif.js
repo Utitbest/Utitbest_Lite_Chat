@@ -47,7 +47,7 @@ const appender = document.querySelector('.theInputsEtc .inputing')
 let ActiveChat = null;
 const userprofileId = document.querySelector('.signs');
 const fileSelection = document.querySelector('.tochat')
-
+// let IfnotGod = document.querySelector('.currentchatterinfor figure')
 
 
 
@@ -107,7 +107,6 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
       firebaseService.listenForMessages11();
       firebaseService.listenForAllChats()
-      console.log(user.uid)
     } else {
       console.error("No user is logged in. Redirecting to login...");
       window.location.href = './indexLogin.html';
@@ -126,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="Profile_i">
                         <h2>Profile</h2>
                         <div style="display:flex; width: 90%; align-items:end;">
-                            <label for="eel" style="margin-left: .5em; position: relative;">
+                            <label for="eel" style="margin-left: .5em; position: relative;" title="Change profile picture">
                                 <img src="" alt="">
                                 <i class="fa fa-edit rr"></i>
                                 <span class="spnman" style="position:absolute; top:36%; left:35%; align-items:center; justify-content:center; height:30px; width:30px; border-radius:50%;  background:#3f6bde;">
@@ -137,21 +136,21 @@ document.addEventListener("DOMContentLoaded", () => {
                            <input type="file" accept="image/*" id="eel" class="nothings">
                         </div>  
                            <div class="namecoms">
-                                <div class="informs" title="Firstname">
+                                <div class="informs" title="${userData.firstname}">
                                     <p>${userData.firstname}</p>
                                     <span class="EditName">
                                         <i class="fa fa-edit" style="z-index:-100;"></i>
                                     </span>
                                 </div>
-                                <div style="margin-top:.6em;" class="informs" title="Lastname">
+                                <div style="margin-top:.6em;" class="informs" title="${userData.lastname}">
                                     <p>${userData.lastname}</p>
                                     <span class="EditName">
                                         <i class="fa fa-edit" style="z-index:-100;"></i>
                                     </span>
                                 </div>
-                                <div style="margin-top:.6em;" class="informs" title="Email">
+                                <div style="margin-top:.6em;" class="informs" title="${userData.email}">
                                     <p>${userData.email}</p>
-                                    <span class="EditName">
+                                    <span class="EditName" style="visibility:hidden;">
                                         <i class="fa fa-edit"></i>
                                     </span>
                                 </div>
@@ -261,10 +260,12 @@ async function UpdatingName(userId) {
 async function loadAllUsers() {
     try{
         const users = await firebaseService.getAllUsers();
+         secondusers.innerHTML = '';
         if(users.length === 0){
             secondusers.innerHTML = 'No other users found.';
             return
         }
+        
         users.forEach((user)  => {
                 if (user.id === currentUserId) {
                     return; 
@@ -303,14 +304,26 @@ async function loadAllUsers() {
                  setUserProfilePicture(user.id, userElement)
                 initializeWebSocket(user.id);
 
-
                 const repumm = document.querySelector('.currentchatterinfor figure img')
-                userElement.addEventListener('click', async() => {
+                const figureMan = document.querySelector('.currentchatterinfor figure');
+
+                userElement.addEventListener('click', async () => {
+                    figureMan.setAttribute('RAdata-set-aria', user.id)
+
+                    document.querySelectorAll('.individualchat').forEach(el => {
+                        el.classList.remove('usertagColor');
+                    });
+                    userElement.classList.add('usertagColor');
+
                     if(userprofileId.classList.contains('dwells')){
                         userprofileId.classList.remove('dwells');
                         userprofileId.classList.add('naturea')
                     }
-                    otherUserId = user.id;
+                    
+                    
+                     otherUserId = user.id;
+
+
                     const storageRef = ref(firebaseService.storage, `profilePictures/${otherUserId}.jpg`);
                     const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`); 
                     let profilePicUrl = null
@@ -326,20 +339,23 @@ async function loadAllUsers() {
                             console.error('Error fetching profile picture:', error.message);
                         }
                     }
+
+
                     chatId = [currentUserId, otherUserId].sort().join('_'); 
                     Chatterinfordisply.innerHTML = user.firstname+ ' ' + user.lastname;
                     initializeChat(chatId); 
                     sendingFilesAsSMS(chatId, currentUserId, otherUserId)
-                    
                 });
-                secondusers.appendChild(userElement);
 
+                secondusers.appendChild(userElement);
+            
         });
     } catch (error) {
         console.error("Error loading users:", error);
         firebaseService.showToast(`Error loading users: ${error.message}`, 'error');
     }
-} 
+}
+
 
 async function setUserProfilePicture(userId, userElement) {
     const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
@@ -354,7 +370,6 @@ async function setUserProfilePicture(userId, userElement) {
     } catch (error) {
         if (error.code === 'storage/object-not-found') {
             const defaultPicUrl = await getDownloadURL(defaultRef);
-
             profileImg.src = defaultPicUrl; 
         } else {
             console.error('Error fetching profile picture:', error.message);
@@ -501,7 +516,8 @@ async function profileDisplayer() {
                 spinner.style.display = 'none';
                 picm.style.display = 'flex';
             }
-        }     
+        }
+            ToViewUserspictureInMax(user.uid)
     })
 }
 await profileDisplayer()
@@ -596,6 +612,7 @@ function getRelativeTime(timestamp) {
 sendbutton.addEventListener("click", async function (){
         const messageContent = chatInputText.value.trim();
         if (messageContent){
+            chatInputText.value = "";
             try {
                 await firebaseService.sendMessage(
                     chatId,
@@ -841,6 +858,93 @@ async function sendingFilesAsSMS(chatId, senderId, recipientId){
 
 }
 
+function ToViewUserspictureInMax(userId){
+    const figureMan = document.querySelector('.iconsdem figure')
+    figureMan.addEventListener('click', async ()=>{
+        const newmedia = document.createElement('div')
+            newmedia.className = 'newmedia';
+
+        const remover = document.createElement('span')
+              remover.className = 'remover';
+              remover.innerHTML = `<i class="fa fa-arrow-left"></i>`;
+
+              remover.addEventListener('click', ()=>{
+                document.querySelectorAll('.newmedia').forEach(newmedia => newmedia.remove())
+                // newmedia.remove()
+              })
+
+
+        const figuremaster = document.createElement('figure')
+              figuremaster.className = 'Tunde'
+        const imgMan = document.createElement('img')
+              imgMan.className = 'imgMan'
+              figuremaster.append(imgMan)
+
+            const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
+            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+           
+            try {
+                const dowm = await getDownloadURL(storageRef)
+                imgMan.src = dowm
+            } catch (error) {
+                  if (error.code === 'storage/object-not-found'){
+                    const ty = await getDownloadURL(defaultRef)
+                    imgMan.src = ty
+                  }else{
+                    imgMan.src = `./Super icons/defualtman.jfif`;
+                    console.error('Error fetching profile picture:', error.message);
+                  }
+            }
+              newmedia.append(remover, figuremaster)
+              document.body.append(newmedia)
+    })
+}
+
+async function ChatterMate() {
+
+    const figureMan = document.querySelector('.currentchatterinfor figure');
+   
+      
+        const newmedia = document.createElement('div');
+        newmedia.className = 'newmedia';
+
+        const remover = document.createElement('span');
+        remover.className = 'remover';
+        remover.innerHTML = `<i class="fa fa-arrow-left"></i>`;
+        remover.addEventListener('click', () => {
+            document.querySelectorAll('.newmedia').forEach((newmedi) => newmedi.remove());
+        });
+
+        const figuremaster = document.createElement('figure');
+        figuremaster.className = 'Tunde';
+        const imgMan = document.createElement('img');
+        imgMan.className = 'imgMan';
+        figuremaster.append(imgMan);
+
+    figureMan.addEventListener('click', async () => {
+        const pals = figureMan.getAttribute('RAdata-set-aria')
+        
+        const storageRef = ref(firebaseService.storage, `profilePictures/${pals}.jpg`);
+        const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+        try {
+            const dowm = await getDownloadURL(storageRef);
+            imgMan.src = dowm;
+        } catch (error) {
+            if (error.code === 'storage/object-not-found') {
+                const ty = await getDownloadURL(defaultRef);
+                imgMan.src = ty;
+            } else {
+                imgMan.src = `./Super icons/defualtman.jfif`;
+                console.error('Error fetching profile picture:', error.message);
+            }
+        }
+
+        newmedia.append(remover, figuremaster);
+        document.body.append(newmedia);
+    });
+}
+await ChatterMate()
+
 // async function updateUserStatus(isOnline) {
 //     const user = auth.currentUser;
 //     if (!user) return;
@@ -983,7 +1087,6 @@ document.addEventListener('click', function(event){
         settingsPopup.classList.add('steeze')
     }
 })
-
 window.addEventListener('online', FreashIn)
 window.addEventListener('offline', FreashOff)
 function FreashIn(){
@@ -1011,6 +1114,7 @@ function FreashOff(){
             totori.remove()
         }, 9000)
 }
+
 ContentDrop()
 HideSettings()
 document.addEventListener("DOMContentLoaded", loadAllUsers())

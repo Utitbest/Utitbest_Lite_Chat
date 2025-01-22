@@ -97,8 +97,8 @@ aside :is(div .iconsdem){
     background-color: #eee;
 }
 .iconsdem figure img{
-    height: inherit;
-    width: inherit;
+    height: 100%;
+    width: 100%;
     object-fit: cover;
     object-position: top;
 }
@@ -169,6 +169,7 @@ main .chat_area{
     border-radius: 10px;
     align-items: center;
     cursor: pointer;
+    margin-bottom: .2em;
 }
 .secondusers .individualchat:hover{
     background-color: #d8d5d591;
@@ -186,8 +187,8 @@ main .chat_area{
     border-radius: 50%;
 }
 .secondusers .individualchat figure img{
-    height: inherit;
-    width: inherit;
+    height: 100%;
+    width: 100%;
     object-fit: cover;
     object-position: top;
 }
@@ -1018,4 +1019,50 @@ div :is(div .times){
     font-size: 10px;
     font-weight: 600;
     text-align: center;
+}
+
+.newmedia{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    position: absolute;
+    z-index: 200;
+    transition:1s linear;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+    background-color: rgb(26 27 27 / 91%);
+}
+.newmedia figure{
+    height: 95%;
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.imgMan{
+    transition: 2s linear;
+    object-fit: contain;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.remover {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    left: 1%;
+    top: 1%;
+    background-color: #eee;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    justify-content:center ;
+}
+
+.usertagColor{
+    background-color: #eee;
 }
