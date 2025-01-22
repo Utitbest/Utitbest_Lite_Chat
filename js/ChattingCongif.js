@@ -1087,7 +1087,12 @@ document.addEventListener('click', function(event){
         settingsPopup.classList.add('steeze')
     }
 })
-window.addEventListener('online', FreashIn)
+window.addEventListener('online', ()=>{
+    FreashIn()
+    setTimeout(()=>{
+        location.reload()
+    },3000)
+})
 window.addEventListener('offline', FreashOff)
 function FreashIn(){
     let totori = document.createElement('div')
