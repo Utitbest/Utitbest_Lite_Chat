@@ -30,6 +30,9 @@ let otherUserId = null
 let chatId = null;
 let FirstNameBoolen = false;
 let LastNameBoolen = false;
+let Iscrolling = false;
+let ActiveChat = null;
+
 
 let socket;
 var contentdrop = document.querySelectorAll('.comeins i');
@@ -44,7 +47,6 @@ var chatInputText = document.querySelector('#messageinput')
 var chatlies1 = document.querySelector('.chatlies1')
 var Chatterinfordisply = document.querySelector('.chattername h3')
 const appender = document.querySelector('.theInputsEtc .inputing')
-let ActiveChat = null;
 const userprofileId = document.querySelector('.signs');
 const fileSelection = document.querySelector('.tochat')
 // let IfnotGod = document.querySelector('.currentchatterinfor figure')
@@ -325,7 +327,7 @@ async function loadAllUsers() {
 
 
                     const storageRef = ref(firebaseService.storage, `profilePictures/${otherUserId}.jpg`);
-                    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`); 
+                    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.png`); 
                     let profilePicUrl = null
                     try {
                         profilePicUrl = await getDownloadURL(storageRef);
@@ -335,7 +337,7 @@ async function loadAllUsers() {
                         const defaultPicUrl = await getDownloadURL(defaultRef);
                         repumm.src = defaultPicUrl;
                         } else {
-                            repumm.src = `./Super icons/defualtman.jfif`
+                            repumm.src = `./Super icons/defualtman.png`
                             console.error('Error fetching profile picture:', error.message);
                         }
                     }
@@ -359,7 +361,7 @@ async function loadAllUsers() {
 
 async function setUserProfilePicture(userId, userElement) {
     const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
-    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.png`);
     const profileImg = userElement.querySelector('.converse');
     const spinner = userElement.querySelector('.spnman11');
     spinner.style.display = 'flex';
@@ -395,7 +397,7 @@ async function updateprofilepic(){
     ssiiee.style.display = 'none'
     spinners.style.display = 'flex';
     const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
-    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+    const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.png`);
 
     try {
         profilePicUrl = await getDownloadURL(storageRef);
@@ -407,8 +409,8 @@ async function updateprofilepic(){
         ssiiee.src = defaultPicUrl;
         userpicture.src = defaultPicUrl
         } else {
-            ssiiee.src = `./Super icons/defualtman.jfif`
-            userpicture.src = `./Super icons/defualtman.jfif`
+            ssiiee.src = `./Super icons/defualtman.png`
+            userpicture.src = `./Super icons/defualtman.png`
             console.error('Error fetching profile picture:', error.message);
         }
     }finally{
@@ -461,8 +463,8 @@ async function updateprofilepic(){
                         if (error.code === 'storage/object-not-found') {
                             console.log('No previous image found. Proceeding with upload.');
                         } else {
-                            ssiiee.src = `./Super icons/defualtman.jfif`;
-                            userpicture.src = `./Super icons/defualtman.jfif`;
+                            ssiiee.src = `./Super icons/defualtman.png`;
+                            userpicture.src = `./Super icons/defualtman.png`;
                             spinners.style.display = 'none';
                             throw error; 
                         }
@@ -497,7 +499,7 @@ async function profileDisplayer() {
         if(user.uid ){
             const picm = document.querySelector('.iconsdem figure img')
             const storageRef = ref(firebaseService.storage, `profilePictures/${user.uid}.jpg`);
-            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.png`);
             const spinner = document.querySelector('.spnman1')
             spinner.style.display = 'flex';
             picm.style.display = 'none';
@@ -509,7 +511,7 @@ async function profileDisplayer() {
                     const ty = await getDownloadURL(defaultRef)
                     picm.src = ty
                   }else{
-                    picm.src = `./Super icons/defualtman.jfif`;
+                    picm.src = `./Super icons/defualtman.png`;
                     console.error('Error fetching profile picture:', error.message);
                   }
             }finally{
@@ -524,6 +526,12 @@ await profileDisplayer()
 
 async function initializeChat(chatId) {
     try {
+
+        if (ActiveChat === chatId) {
+            console.log("Already in this chat, skipping initialization.");
+            return;
+        }
+
         ActiveChat = chatId;
         chatlies1.innerHTML = "";
 
@@ -566,10 +574,61 @@ async function initializeChat(chatId) {
                         <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
                     `;
                 } else if (message.content?.type === 'audio') {
-                    messageElement2.innerHTML = `
-                        <audio src="${message.content.url}" style="height:40px; margin-bottom:.5em;" controls></audio>
-                        <h6>${getRelativeTime(message.timestamp.seconds)}</h6>
-                    `;
+                    // <audio src="${message.content.url}" style="height:40px; margin-bottom:.5em;" controls></audio>
+
+                        const audiomessageTag = document.createElement('div')
+                                audiomessageTag.className = 'audiomessageTag';
+
+                        const playButton = document.createElement('span')
+                                playButton.className = 'playButton';
+                        const invie = document.createElement('span')
+                                invie.className = 'invie'
+                                invie.innerHTML = '<i class="fa fa-play"></i>';
+                        playButton.appendChild(invie)
+
+                        const rangewrap = document.createElement('div')
+                                rangewrap.className = 'rangewrap';
+                        const ProgressContain = document.createElement('div')
+                                ProgressContain.className = 'ProgressContain';
+                        const mainprogress = document.createElement('span')
+                                ProgressContain.append(mainprogress)
+                            rangewrap.appendChild(ProgressContain)
+                        
+                        const timeNull = document.createElement('span')
+                            timeNull.className = 'timeNull';
+                            timeNull.innerHTML = '00:00'
+                            audiomessageTag.append(playButton, rangewrap, timeNull)
+                        const albumname = document.createElement('utitbest')
+                                albumname.className = 'albumname'
+                        const timescrap = document.createElement('h6')
+                                timescrap.style.alignItems = 'unset'
+                                timescrap.innerHTML = getRelativeTime(message.timestamp.seconds)
+                            messageElement2.append(audiomessageTag, albumname, timescrap)
+                        
+                            const audio = new Audio(message.content.url)
+                            let Isplaying = false;
+                            // console.log(audio.currentTime)
+                            albumname.innerText = message.content.name
+
+                            invie.addEventListener('click', function(event){
+                                if (Isplaying) {
+                                    audio.pause();
+                                    invie.innerHTML = '<i class="fas fa-play"></i>'; 
+                                } else{
+                                    audio.play();
+                                    invie.innerHTML = '<i class="fas fa-pause"></i>'; 
+                                }
+                                  Isplaying = !Isplaying;
+                            })
+
+                            audio.addEventListener('timeupdate', ()=>{
+                                const AudioProgress = (audio.currentTime / audio.duration) * 100;
+                                console.log(AudioProgress)
+                                const dkkd = audio.currentTime
+                                timeNull.innerText = Math.floor(dkkd / 1000)
+                                    //  TO CONTINUE FROM HERE
+                                mainprogress.style.width = `${AudioProgress}%`;
+                            })
                 } else {
                     messageElement2.innerHTML = `
                         <a href="${message.content.url}" target="_blank">${message.content.name}</a>
@@ -578,16 +637,20 @@ async function initializeChat(chatId) {
                 }
                 messageElement1.append(messageElement2);
                 messageElement.append(messageElement1);
-                chatlies1.prepend(messageElement);
+                chatlies1.append(messageElement);
             });
-
-            // Scroll to the latest message
             chatlies1.scrollTop = chatlies1.scrollHeight;
         });
     } catch (error) {
         console.error("Error initializing chat:", error);
     }
 }
+
+
+
+
+
+
 function getRelativeTime(timestamp) {
     const currentTime = new Date();
     const messageTime = new Date(timestamp * 1000); // Convert seconds to milliseconds
@@ -881,7 +944,7 @@ function ToViewUserspictureInMax(userId){
               figuremaster.append(imgMan)
 
             const storageRef = ref(firebaseService.storage, `profilePictures/${userId}.jpg`);
-            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+            const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.png`);
            
             try {
                 const dowm = await getDownloadURL(storageRef)
@@ -891,7 +954,7 @@ function ToViewUserspictureInMax(userId){
                     const ty = await getDownloadURL(defaultRef)
                     imgMan.src = ty
                   }else{
-                    imgMan.src = `./Super icons/defualtman.jfif`;
+                    imgMan.src = `./Super icons/defualtman.png`;
                     console.error('Error fetching profile picture:', error.message);
                   }
             }
@@ -925,7 +988,7 @@ async function ChatterMate() {
         const pals = figureMan.getAttribute('RAdata-set-aria')
         
         const storageRef = ref(firebaseService.storage, `profilePictures/${pals}.jpg`);
-        const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.jfif`);
+        const defaultRef = ref(firebaseService.storage, `profilePictures/defualtman.png`);
         try {
             const dowm = await getDownloadURL(storageRef);
             imgMan.src = dowm;
@@ -934,7 +997,7 @@ async function ChatterMate() {
                 const ty = await getDownloadURL(defaultRef);
                 imgMan.src = ty;
             } else {
-                imgMan.src = `./Super icons/defualtman.jfif`;
+                imgMan.src = `./Super icons/defualtman.png`;
                 console.error('Error fetching profile picture:', error.message);
             }
         }
