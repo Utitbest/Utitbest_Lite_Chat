@@ -422,6 +422,14 @@ div :is(div .times){
     align-items: center;
     text-align: right;
 }
+.flowsa0 utitbest{
+    color: white;
+    font-size: 10px;
+    font-weight: 500;
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis ;
+}
 
 .flowsa1{ 
     display: flex;
@@ -454,6 +462,14 @@ div :is(div .times){
     gap: 3px;
 }
 
+.flowsa1 utitbest{
+    color: gray;
+    font-size: 10px;
+    font-weight: 500;
+    overflow:hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis ;
+}
 
 .theInputsEtc{
     height: 8%;
@@ -1125,17 +1141,10 @@ div :is(div .times){
 }
 .ProgressContain span{
     height: 100%;
-    background-image: linear-gradient(to right, transparent, #333, transparent);
+    background-image: linear-gradient(to right, #0a70ea, #999999, transparent);
     background-size: 10px 10px; 
-    width: 100%;
+    width: 0;
+    display: flex;
     border-radius: 5px;
     transition: width 0.3s ease;
-}
-.albumname{
-    color: gray;
-    font-size: 10px;
-    font-weight: 500;
-    overflow:hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis ;
 }

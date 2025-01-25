@@ -49,7 +49,8 @@ var Chatterinfordisply = document.querySelector('.chattername h3')
 const appender = document.querySelector('.theInputsEtc .inputing')
 const userprofileId = document.querySelector('.signs');
 const fileSelection = document.querySelector('.tochat')
-// let IfnotGod = document.querySelector('.currentchatterinfor figure')
+let currentPlayingAudio = null
+
 
 
 
@@ -605,29 +606,64 @@ async function initializeChat(chatId) {
                                 timescrap.innerHTML = getRelativeTime(message.timestamp.seconds)
                             messageElement2.append(audiomessageTag, albumname, timescrap)
                         
-                            const audio = new Audio(message.content.url)
+                            const audio = document.createElement('audio')
+                                audio.src = message.content.url
                             let Isplaying = false;
+                            let initializatDurateion = 0
+                            let Fortmated = null
                             // console.log(audio.currentTime)
                             albumname.innerText = message.content.name
 
-                            invie.addEventListener('click', function(event){
-                                if (Isplaying) {
-                                    audio.pause();
-                                    invie.innerHTML = '<i class="fas fa-play"></i>'; 
-                                } else{
-                                    audio.play();
-                                    invie.innerHTML = '<i class="fas fa-pause"></i>'; 
-                                }
-                                  Isplaying = !Isplaying;
+                            invie.addEventListener('click', function(){
+                               
+                                if (!Isplaying) {
+                                    audio.play(); 
+                                  } else {
+                                    audio.pause(); 
+                                  }
+                                
                             })
 
+                            audio.addEventListener('play', () => {
+                                if (currentPlayingAudio && currentPlayingAudio !== audio) {
+                                  currentPlayingAudio.pause();
+                                }
+                                currentPlayingAudio = audio;
+                                Isplaying = true;
+                                 invie.innerHTML = '<i class="fas fa-pause"></i>'; 
+                              });
+                      
+                              audio.addEventListener('pause', () => {
+                                Isplaying = false;
+                                invie.innerHTML = '<i class="fas fa-play"></i>'; 
+                              });
+
+                            audio.addEventListener('loadedmetadata', ()=>{
+                                initializatDurateion = audio.duration
+                                Fortmated = formatingTime(initializatDurateion)
+                                timeNull.innerText = Fortmated;
+                            })
+
+                            function formatingTime(duration){
+                                let seconds = Math.floor(duration % 60);
+                                let minutes = Math.floor(duration / 60);
+                                const fromatedsecon = seconds < 10 ? `0${seconds}` : seconds;
+                                return minutes +':'+fromatedsecon;
+                            }
                             audio.addEventListener('timeupdate', ()=>{
+                                const currentman = audio.currentTime;
+                                const remainingTime = initializatDurateion - currentman;
+                                timeNull.innerText = formatingTime(remainingTime)
                                 const AudioProgress = (audio.currentTime / audio.duration) * 100;
-                                console.log(AudioProgress)
-                                const dkkd = audio.currentTime
-                                timeNull.innerText = Math.floor(dkkd / 1000)
-                                    //  TO CONTINUE FROM HERE
                                 mainprogress.style.width = `${AudioProgress}%`;
+                            
+                            })  
+                            audio.addEventListener('ended', ()=>{
+                                Isplaying = false;
+                                invie.innerHTML = '<i class="fas fa-play"></i>';
+                                timeNull.innerText = Fortmated;
+                                mainprogress.style.width = `0%`;
+                                currentPlayingAudio = null
                             })
                 } else {
                     messageElement2.innerHTML = `
@@ -1182,6 +1218,13 @@ function FreashOff(){
             totori.remove()
         }, 9000)
 }
+window.addEventListener("play", function(evt) {
+    if(window.$_currentlyPlaying && window.$_currentlyPlaying != evt.target) {
+      window.$_currentlyPlaying.pause();
+    }
+    window.$_currentlyPlaying = evt.target;
+}, true);
+
 
 ContentDrop()
 HideSettings()
